@@ -1,0 +1,111 @@
+import requests
+import time
+from lxml import html
+from bs4 import BeautifulSoup
+from param import *
+import os
+
+
+def dispatch_urls(scripts_dict, curr_site_dir):
+    '''
+    def count_offset(text, script_idx, oft_before_tag, oft_after_tag):
+        total_oft = 0
+        text_by_line = text.splitlines()
+        for i in range(script_idx):
+            total_oft += text_by_line[i] + 1
+        return total_oft + oft_before_tag + oft_after_tag
+    '''
+    curr_site_js_dir = curr_site_dir + 'modified_js/'
+    replace_res = open(curr_site_dir + 'replace_res', 'w+')
+    if scripts_dict is not None:
+        for key, val in scripts_dict.iteritems():
+            js_url = key[1:][:-1]
+            print '[INFO][modify] Now modifying script ' + js_url + '...'
+            source = fetch_source(js_url)
+            for pos, count in reversed(sorted(val.iteritems())):
+                js_pos = pos
+                print '[INFO][modify] Now we are at offset ' + js_pos + '...'
+                source, begin, expr = modify_expr(source, js_pos)
+                source = add_temp_var(source, begin, expr)
+            if not os.path.exists(curr_site_js_dir):
+                print '[INFO][modify] Now creating the folder ' + curr_site_js_dir + '...'
+                os.mkdir(curr_site_js_dir)
+            modified_fname = 'modified_file_' + str(int(time.time() * 100))
+            js_file = open(curr_site_js_dir + modified_fname, 'w+')
+            js_file.write(source.encode('utf8'))
+            js_file.close()
+            replace_res.write(js_url + ' -> ' + modified_fname + ' {triggering_expression: ' + expr + '}\n')
+    else:
+        print '[INFO][modify] No script to replace!'
+    replace_res.close()
+
+
+def fetch_source(url):
+    r = requests.get(url=url, headers=FAKE_HEADER)
+    if r.status_code != 200:
+        return -1
+    else:
+        return r.text
+
+
+def modify_expr(source, stmt_offset):
+    def is_html(source):
+        tree = html.fromstring(source)
+        if tree.tag == 'html':
+            print '[INFO][modify] This is a HTML'
+            return True
+        elif tree.tag == 'p' or 'div':
+            print '[INFO][modify] This is not a HTML'
+            return False
+        else:
+            print '[ERROR][modify] Source type check failed: this document is of type ' + tree.tag
+    stack = []
+    stmt_offset = int(stmt_offset)
+    idx = int(stmt_offset)
+    if is_html(source):
+        soup = BeautifulSoup(source, "lxml")
+        scripts = soup.find_all('script')
+        target_script_idx = -1
+        for i in range(len(scripts)):
+            curr_script = scripts[i].text
+            if stmt_offset + 2 > len(curr_script):
+                continue
+            if curr_script[stmt_offset:stmt_offset + 2] == 'if':
+                target_script_idx = i
+        if target_script_idx == -1:
+            print "[ERROR][modify] No 'if' stmt accurately matched!"
+        idx = stmt_offset + source.find(scripts[target_script_idx].text)
+    while source[idx] != '(':
+        idx += 1
+    begin = idx
+    idx += 1
+    stack.append(source[begin])
+    while stack and idx < len(source):
+        if source[idx] == '(':
+            stack.append(source[idx])
+        elif source[idx] == ')':
+            if stack == [] or stack.pop() != '(':
+                print '[ERROR][modify] Invalid parenthesis!'
+                return -1
+        idx += 1
+    end = idx
+    if stack:
+        print '[ERROR][modify] Invalid parenthesis!'
+        return -1
+    expr = source[begin:end]
+    source = source[:begin] + '(false)' + source[end:]
+    print '[INFO][modify] ' + expr + ' is the identified and extracted conditional expression'
+    return source, begin, expr
+
+
+def add_temp_var(source, begin_idx, expr):
+    idx = begin_idx
+    while source[idx:idx + 2] != 'if':
+        idx -= 1
+        if idx < 0:
+            print "[ERROR][modify] Beginning of the source reached, but no 'if' found!"
+    source_modified = source[:idx] + 'temp_var_' + str(int(time.time() * 100)) + '=' + expr + ';' + source[idx:]
+    return source_modified
+
+if __name__ == '__main__':
+    modify_expr(requests.get('https://s1.kbb.com/static/js/global/site-js-top?v=LodAQqs8UK81Hn3e4bPYSoX4X86clCR7IelLcy-9_UA1').text, 246344)

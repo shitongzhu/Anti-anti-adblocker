@@ -1,0 +1,224 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import subprocess
+import time
+import re
+import shutil
+from param import *
+from utils import *
+
+
+def url_reader(path_to_urllist):
+    f = open(path_to_urllist, 'r')
+    lst = f.readline()
+    return lst.strip()
+
+
+def url_loader(url, options, flag_warming=False):
+    if flag_warming is True:
+        cmd = PATH_TO_CHROMIUM + '/chrome'
+        print "[INFO][looper] Warming up Chromium..."
+    else:
+        cmd = PATH_TO_CHROMIUM + '/chrome'
+        print "[INFO][looper] Visiting " + url
+    for o in options:
+        cmd += ' ' + o
+    if url:
+        cmd += ' ' + url
+    subprocess.Popen(args=cmd, shell=True)
+
+
+def log_extractor(path_to_log, flag_mode):
+    def load(path_to_file):
+        f = open(path_to_file, 'r')
+        lst = f.readlines()
+        f.close()
+        return lst
+
+    def unload(path_to_file, lst):
+        f = open(path_to_file, 'w')
+        f.writelines(lst)
+        f.close()
+        return
+
+    def func_blacklist(line):
+        for kword in NO_KEYWORDS:
+            if kword in line:
+                return False
+        return True
+
+    def func_whitelist(line):
+        for kword in YES_KEYWORDS:
+            if kword in line:
+                return True
+        return False
+
+    def func_regex(line):
+        if re.match(log_pattern, line):
+            return True
+        else:
+            return False
+
+    def filter_by_kword(lst):
+        return [line for line in lst if func_regex(line)]
+
+    log = load(path_to_log)
+    log_pattern = re.compile(PATTERN_LOG)
+    filtered_log = filter_by_kword(log)
+
+    if flag_mode == FLAG_W_AB:
+        output_dir = (PATH_TO_FILTERED_LOG + url + '/w_adblocker/')
+    else:
+        output_dir = (PATH_TO_FILTERED_LOG + url + '/wo_adblocker/')
+    output_path = output_dir + 'filtered_log_' + str(int(time.time() * 100)) + '.log'
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    unload(output_path, filtered_log)
+    return output_dir
+
+
+def log_differ(path_to_dir, flag_mode):
+    files = []
+    grand_dict = {}
+    run_count = 0
+    log_pattern = re.compile(PATTERN_LOG)
+    blklist = set()
+    for fname in os.listdir(path_to_dir):
+        files.append(path_to_dir + fname)
+
+    def regex_match(line):
+        reg_match = re.match(log_pattern, line)
+        if reg_match:
+            reg_group = reg_match.groups()
+            return reg_group
+        else:
+            return None
+
+    for f in files:
+        run_count += 1
+        log_file = open(f, 'r')
+        lst = log_file.readlines()
+        for idx in range(1, len(lst) - 1):
+            reg_group_prev, reg_group_curr, reg_group_next = \
+                regex_match(lst[idx - 1]), regex_match(lst[idx]), regex_match(lst[idx + 1])
+            if reg_group_curr is None or reg_group_next is None or reg_group_prev is None:
+                continue
+            trace_key_curr = reg_group_curr[0] + reg_group_curr[2]
+            trace_key_next = reg_group_next[0] + reg_group_next[2]
+            trace_key_prev = reg_group_prev[0] + reg_group_prev[2]
+
+            if reg_group_curr[1] == 'IF':
+                if trace_key_curr != trace_key_next \
+                        or (trace_key_curr == trace_key_next and reg_group_next[1] == 'IF'):
+                    if grand_dict.get(trace_key_curr, -1) == -1:
+                        grand_dict[trace_key_curr] = [THIS_POS_ONLY_HAS_IF, {run_count}]
+                    else:
+                        if grand_dict[trace_key_curr][0] != THIS_POS_ONLY_HAS_IF:
+                            grand_dict[trace_key_curr][0] = THIS_POS_ONLY_HAS_IF
+                            grand_dict[trace_key_curr][1].add(run_count)
+                            blklist.add(trace_key_curr)
+                        else:
+                            grand_dict[trace_key_curr][1].add(run_count)
+                else:
+                    continue
+            elif reg_group_curr[1] == 'THEN':
+                if grand_dict.get(trace_key_curr, -1) == -1:
+                    grand_dict[trace_key_curr] = [THIS_POS_HAS_IF_THEN, {run_count}]
+                elif grand_dict[trace_key_curr][0] == THIS_POS_ONLY_HAS_IF and trace_key_curr != trace_key_prev\
+                        and run_count in grand_dict[trace_key_curr][1]:
+                    grand_dict[trace_key_curr][0] = THIS_POS_HAS_IF_THEN
+                    blklist.discard(trace_key_curr)
+                else:
+                    if grand_dict[trace_key_curr][0] != THIS_POS_HAS_IF_THEN:
+                        blklist.add(trace_key_curr)
+                    else:
+                        grand_dict[trace_key_curr][1].add(run_count)
+            elif reg_group_curr[1] == 'ELSE':
+                if grand_dict.get(trace_key_curr, -1) == -1:
+                    grand_dict[trace_key_curr] = [THIS_POS_HAS_IF_ELSE, {run_count}]
+                elif grand_dict[trace_key_curr][0] == THIS_POS_ONLY_HAS_IF and trace_key_curr != trace_key_prev\
+                        and run_count in grand_dict[trace_key_curr][1]:
+                    grand_dict[trace_key_curr][0] = THIS_POS_HAS_IF_ELSE
+                    blklist.discard(trace_key_curr)
+                else:
+                    if grand_dict[trace_key_curr][0] != THIS_POS_HAS_IF_ELSE:
+                        blklist.add(trace_key_curr)
+                    else:
+                        grand_dict[trace_key_curr][1].add(run_count)
+
+    grand_dict_copy = grand_dict.copy()
+    if flag_mode == FLAG_W_AB:
+        threshold = DIFF_THRESHD_W_AB
+    else:
+        threshold = DIFF_THRESHD_WO_AB
+    for key, val in grand_dict.iteritems():
+        if key in blklist or run_count - len(val[1]) > threshold:
+            del grand_dict_copy[key]
+    return grand_dict_copy
+
+
+def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab):
+    f = open(path_to_dir + 'diff_res', 'w')
+    flag_flipping = False
+    print "[INFO][looper] Starting log diff..."
+    for key, value in dict_wo_ab.iteritems():
+        curr_val = dict_w_ab.get(key, -1)
+        if curr_val == -1:
+            continue
+        if curr_val[0] != value[0]:
+            flag_flipping = True
+            match_mark = "unmatched: pos " + str(key) + " abp-on " + str(dict_w_ab.get(key, -1)) \
+                         + " abp-off " + str(dict_wo_ab.get(key, -1))
+            f.write(match_mark + '\n')
+            print '[INFO][looper] ' + match_mark
+    if flag_flipping is False:
+        print "[INFO][looper] No unmatch detected!"
+        f.write('no unmatch detected!\n')
+    f.close()
+    return flag_flipping is True
+
+
+if __name__ == '__main__':
+    def kill_all_chrome():
+        for t in range(KILL_TIMES):
+            os.system('pkill chrome')
+    #positive_res = set()
+
+    while url_reader(PATH_TO_URLFILE) is not None:
+        url = url_reader(PATH_TO_URLFILE)
+        try:
+            shutil.rmtree(PATH_TO_FILTERED_LOG + url)
+        except OSError as err:
+            print "[INFO][looper] No existing directory"
+        else:
+            print "[INFO][looper] Deleted duplicate directory"
+        # 1st pass, with adblock enabled
+        # tick its runtime
+        for i in range(NUM_OF_RUNS):
+            url_loader(None, OPT_W_AB, True)
+            time.sleep(TIMEOUT_WARMING)
+            url_loader(url, OPT_W_AB, False)
+            time.sleep(TIMEOUT_LOAD_W_AB)
+            kill_all_chrome()
+            site_dir1 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_W_AB)
+
+            # 2nd pass, with adblock disabled
+            url_loader(url, OPT_WO_AB, False)
+            time.sleep(TIMEOUT_LOAD_WO_AB)
+            kill_all_chrome()
+            site_dir2 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB)
+        hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB)
+        hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB)
+        curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
+        res_flag = log_reporter(curr_site_dir, hashtable1, hashtable2)
+        js_dict = {}
+
+        js_dict = single_log_stat_analyzer(curr_site_dir)
+        dispatch_urls(js_dict, curr_site_dir)
+        sync_list_file(PATH_TO_URLFILE)
+        #if res_flag:
+        #    positive_res.add(url)
+
+    print '[INFO][looper] A batch of experiment is done!'
+    #print positive_res
