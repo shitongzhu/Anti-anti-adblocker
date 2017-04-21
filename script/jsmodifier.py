@@ -21,20 +21,22 @@ def dispatch_urls(scripts_dict, curr_site_dir):
         for key, val in scripts_dict.iteritems():
             js_url = key[1:][:-1]
             print '[INFO][modify] Now modifying script ' + js_url + '...'
+            modified_fname = 'modified_file_' + str(int(time.time() * 100))
+            replace_res.write(js_url + ' -> ' + modified_fname + ' | ' + str(len(val)) + ' replacement(s)\n')
             source = fetch_source(js_url)
             for pos, count in reversed(sorted(val.iteritems())):
                 js_pos = pos
                 print '[INFO][modify] Now we are at offset ' + js_pos + '...'
-                source, begin, expr = modify_expr(source, js_pos)
+                source, begin, expr, idx = modify_expr(source, js_pos)
                 source = add_temp_var(source, begin, expr)
+                replace_res.write('expr: ' + expr + ' | index: ' + str(idx) + ' | offset: ' + js_pos + '\n')
+            replace_res.write('\n')
             if not os.path.exists(curr_site_js_dir):
                 print '[INFO][modify] Now creating the folder ' + curr_site_js_dir + '...'
                 os.mkdir(curr_site_js_dir)
-            modified_fname = 'modified_file_' + str(int(time.time() * 100))
             js_file = open(curr_site_js_dir + modified_fname, 'w+')
             js_file.write(source.encode('utf8'))
             js_file.close()
-            replace_res.write(js_url + ' -> ' + modified_fname + ' {triggering_expression: ' + expr + '}\n')
     else:
         print '[INFO][modify] No script to replace!'
     replace_res.close()
@@ -60,12 +62,12 @@ def modify_expr(source, stmt_offset):
         else:
             print '[ERROR][modify] Source type check failed: this document is of type ' + tree.tag
     stack = []
+    target_script_idx = -1
     stmt_offset = int(stmt_offset)
     idx = int(stmt_offset)
     if is_html(source):
         soup = BeautifulSoup(source, "lxml")
         scripts = soup.find_all('script')
-        target_script_idx = -1
         for i in range(len(scripts)):
             curr_script = scripts[i].text
             if stmt_offset + 2 > len(curr_script):
@@ -75,7 +77,7 @@ def modify_expr(source, stmt_offset):
         if target_script_idx == -1:
             print "[ERROR][modify] No 'if' stmt accurately matched!"
         idx = stmt_offset + source.find(scripts[target_script_idx].text)
-    while source[idx] != '(':
+    while source[idx] != '(' and idx + 1 <= len(source):
         idx += 1
     begin = idx
     idx += 1
@@ -95,7 +97,7 @@ def modify_expr(source, stmt_offset):
     expr = source[begin:end]
     source = source[:begin] + '(false)' + source[end:]
     print '[INFO][modify] ' + expr + ' is the identified and extracted conditional expression'
-    return source, begin, expr
+    return source, begin, expr, target_script_idx
 
 
 def add_temp_var(source, begin_idx, expr):

@@ -185,7 +185,7 @@ if __name__ == '__main__':
             os.system('pkill chrome')
     #positive_res = set()
 
-    while url_reader(PATH_TO_URLFILE) is not None:
+    while url_reader(PATH_TO_URLFILE):
         url = url_reader(PATH_TO_URLFILE)
         try:
             shutil.rmtree(PATH_TO_FILTERED_LOG + url)
