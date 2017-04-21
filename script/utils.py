@@ -47,7 +47,7 @@ def log_stat_collector(path_to_filtered_dir, path_to_stat_file):
 def dump_alexa_sites(top_n):
     urllist = alexa.top_list(top_n)
     urllist = zip(*urllist)[1]
-    #urllist = map(lambda lne: 'http://www.' + lne + '/\n', urllist)
+    urllist = map(lambda lne: lne + '\n', urllist)
     print urllist
     with open(PATH_TO_URLFILE, 'w') as f:
         f.writelines(urllist)

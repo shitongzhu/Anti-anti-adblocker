@@ -1,12 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# browser id
+ID = '0'
+
 # paths
-PATH_TO_CHROMIUM = '/home/shitong/Research/Release_0/chrome'
+PATH_TO_CHROMIUM = '/home/shitong/Research/releases/Release_' + ID + '/chrome'
 PATH_TO_URLFILE  = '../res/scanning_list'
-PATH_TO_LOG      = '/tmp/adblock_trace_0.log'
-PATH_TO_FILTERED_LOG = '/home/shitong/Research/JSPROJ/log/'
-PATH_TO_STAT_FILE = '/home/shitong/Research/JSPROJ/total_stat'
+PATH_TO_LOG      = '/tmp/adblock_trace_' + ID + '.log'
+PATH_TO_FILTERED_LOG = '/home/shitong/Research/logs/log_' + ID + '/'
+PATH_TO_STAT_FILE = '/home/shitong/Research/logs/total_stat'
+PATH_TO_PROFILE = '/home/shitong/Research/profiles/Default' + ID
 
 # signals
 SIGSUCCESS = 1
@@ -48,8 +52,8 @@ TIMEOUT_LOAD_WO_AB = 30
 TIMEOUT_WARMING = 5
 
 # command switches for starting Chromium enabled/disabled
-OPT_W_AB = [PATH_TO_CHROMIUM, '--no-sandbox']
-OPT_WO_AB = [PATH_TO_CHROMIUM, '--no-sandbox', '--disable-extensions']
+OPT_W_AB = [PATH_TO_CHROMIUM, '--no-sandbox', '--user-data-dir=' + PATH_TO_PROFILE]
+OPT_WO_AB = [PATH_TO_CHROMIUM, '--no-sandbox', '--disable-extensions', '--user-data-dir=' + PATH_TO_PROFILE]
 
 XVFB_PREF = "xvfb-run --server-args='-screen 0, 1024x768x24' "
 
