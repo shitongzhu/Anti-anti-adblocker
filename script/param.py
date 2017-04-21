@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 # paths
-PATH_TO_CHROMIUM = '/media/shitong/Lab/Release/chrome'
+PATH_TO_CHROMIUM = '/home/shitong/Research/Release_0/chrome'
 PATH_TO_URLFILE  = '../res/scanning_list'
-PATH_TO_LOG      = '/tmp/adblock_trace.log'
-PATH_TO_FILTERED_LOG = '/media/shitong/Lab/JSPROJ/log/'
-PATH_TO_STAT_FILE = '/media/shitong/Lab/JSPROJ/total_stat'
+PATH_TO_LOG      = '/tmp/adblock_trace_0.log'
+PATH_TO_FILTERED_LOG = '/home/shitong/Research/JSPROJ/log/'
+PATH_TO_STAT_FILE = '/home/shitong/Research/JSPROJ/total_stat'
 
 # signals
 SIGSUCCESS = 1
