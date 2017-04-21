@@ -4,6 +4,7 @@ from lxml import html
 from bs4 import BeautifulSoup
 from param import *
 import os
+from ssl import SSLError
 
 
 def dispatch_urls(scripts_dict, curr_site_dir):
@@ -24,6 +25,8 @@ def dispatch_urls(scripts_dict, curr_site_dir):
             modified_fname = 'modified_file_' + str(int(time.time() * 100))
             replace_res.write(js_url + ' -> ' + modified_fname + ' | ' + str(len(val)) + ' replacement(s)\n')
             source = fetch_source(js_url)
+            if source == -1:
+                continue
             for pos, count in reversed(sorted(val.iteritems())):
                 js_pos = pos
                 print '[INFO][modify] Now we are at offset ' + js_pos + '...'
@@ -43,7 +46,11 @@ def dispatch_urls(scripts_dict, curr_site_dir):
 
 
 def fetch_source(url):
-    r = requests.get(url=url, headers=FAKE_HEADER)
+    try:
+        r = requests.get(url=url, headers=FAKE_HEADER)
+    except SSLError:
+        print '[ERROR][modify] SSL error found, no response'
+        return -1
     if r.status_code != 200:
         return -1
     else:

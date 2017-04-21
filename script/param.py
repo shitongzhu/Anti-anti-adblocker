@@ -1,8 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import os
+
+curr_path = os.getcwd()
+
 # browser id
-ID = '0'
+ID = curr_path[-1]
 
 # paths
 PATH_TO_CHROMIUM = '/home/shitong/Research/releases/Release_' + ID + '/chrome'
