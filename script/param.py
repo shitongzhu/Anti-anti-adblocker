@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 # paths
-PATH_TO_CHROMIUM = '/home/shitong/Research/Release_old'
+PATH_TO_CHROMIUM = '/media/shitong/Lab/Release/chrome'
 PATH_TO_URLFILE  = '../res/scanning_list'
 PATH_TO_LOG      = '/tmp/adblock_trace.log'
-PATH_TO_FILTERED_LOG = '/home/shitong/Research/JSPROJ/log/'
-PATH_TO_STAT_FILE = '/home/shitong/Research/JSPROJ/total_stat'
+PATH_TO_FILTERED_LOG = '/media/shitong/Lab/JSPROJ/log/'
+PATH_TO_STAT_FILE = '/media/shitong/Lab/JSPROJ/total_stat'
 
 # signals
 SIGSUCCESS = 1
@@ -48,8 +48,8 @@ TIMEOUT_LOAD_WO_AB = 30
 TIMEOUT_WARMING = 5
 
 # command switches for starting Chromium enabled/disabled
-OPT_W_AB = ['--no-sandbox']
-OPT_WO_AB = ['--no-sandbox', '--disable-extensions']
+OPT_W_AB = [PATH_TO_CHROMIUM, '--no-sandbox']
+OPT_WO_AB = [PATH_TO_CHROMIUM, '--no-sandbox', '--disable-extensions']
 
 XVFB_PREF = "xvfb-run --server-args='-screen 0, 1024x768x24' "
 

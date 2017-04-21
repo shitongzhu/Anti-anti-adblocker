@@ -15,18 +15,21 @@ def url_reader(path_to_urllist):
     return lst.strip()
 
 
-def url_loader(url, options, flag_warming=False):
-    if flag_warming is True:
-        cmd = PATH_TO_CHROMIUM + '/chrome'
+def url_loader(url, is_with_ext):
+    is_warming = False if url else True
+    if is_warming:
         print "[INFO][looper] Warming up Chromium..."
+        if is_with_ext:
+            args = OPT_W_AB
+        else:
+            args = OPT_WO_AB
     else:
-        cmd = PATH_TO_CHROMIUM + '/chrome'
         print "[INFO][looper] Visiting " + url
-    for o in options:
-        cmd += ' ' + o
-    if url:
-        cmd += ' ' + url
-    subprocess.Popen(args=cmd, shell=True)
+        if is_with_ext:
+            args = OPT_W_AB + [url]
+        else:
+            args = OPT_WO_AB + [url]
+    return subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
 
 
 def log_extractor(path_to_log, flag_mode):
@@ -180,11 +183,6 @@ def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab):
 
 
 if __name__ == '__main__':
-    def kill_all_chrome():
-        for t in range(KILL_TIMES):
-            os.system('pkill chrome')
-    #positive_res = set()
-
     while url_reader(PATH_TO_URLFILE):
         url = url_reader(PATH_TO_URLFILE)
         try:
@@ -196,17 +194,18 @@ if __name__ == '__main__':
         # 1st pass, with adblock enabled
         # tick its runtime
         for i in range(NUM_OF_RUNS):
-            url_loader(None, OPT_W_AB, True)
+            p0 = url_loader(None, is_with_ext=True)
             time.sleep(TIMEOUT_WARMING)
-            url_loader(url, OPT_W_AB, False)
+            p1 = url_loader(url, is_with_ext=True)
             time.sleep(TIMEOUT_LOAD_W_AB)
-            kill_all_chrome()
+            p0.kill()
+            p1.kill()
             site_dir1 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_W_AB)
 
             # 2nd pass, with adblock disabled
-            url_loader(url, OPT_WO_AB, False)
+            p2 = url_loader(url, is_with_ext=False)
             time.sleep(TIMEOUT_LOAD_WO_AB)
-            kill_all_chrome()
+            p2.kill()
             site_dir2 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB)
         hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB)
         hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB)
@@ -217,8 +216,5 @@ if __name__ == '__main__':
         js_dict = single_log_stat_analyzer(curr_site_dir)
         dispatch_urls(js_dict, curr_site_dir)
         sync_list_file(PATH_TO_URLFILE)
-        #if res_flag:
-        #    positive_res.add(url)
 
     print '[INFO][looper] A batch of experiment is done!'
-    #print positive_res
