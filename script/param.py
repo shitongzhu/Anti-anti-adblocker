@@ -10,7 +10,7 @@ PATH_TO_URLFILE  = '../res/scanning_list'
 PATH_TO_LOG      = '/tmp/adblock_trace_' + ID + '.log'
 PATH_TO_FILTERED_LOG = '/home/shitong/Research/logs/log_' + ID + '/'
 PATH_TO_STAT_FILE = '/home/shitong/Research/logs/total_stat'
-PATH_TO_PROFILE = '/home/shitong/Research/profiles/Default' + ID
+PATH_TO_PROFILE = '/home/shitong/Research/profiles/profile' + ID
 
 # signals
 SIGSUCCESS = 1
@@ -46,7 +46,7 @@ THIS_POS_HAS_IF_THEN = 1
 THIS_POS_HAS_IF_ELSE = 2
 
 # timeout for loading pages (by sec)
-TIMEOUT_LOAD_W_AB = 100
+TIMEOUT_LOAD_W_AB = 120
 TIMEOUT_LOAD_WO_AB = 30
 
 TIMEOUT_WARMING = 5
