@@ -4,17 +4,19 @@
 import os
 
 curr_path = os.getcwd()
+print curr_path
 
 # browser id
 ID = curr_path[-1]
+print ID
 
 # paths
-PATH_TO_CHROMIUM = '/home/shitong/Research/releases/Release_' + ID + '/chrome'
-PATH_TO_URLFILE  = '../res/scanning_list'
-PATH_TO_LOG      = '/tmp/adblock_trace_' + ID + '.log'
+PATH_TO_CHROMIUM     = '/home/shitong/Research/releases/Release_' + ID + '/chrome'
+PATH_TO_URLFILE      = 'res/scanning_list'
+PATH_TO_LOG          = '/tmp/adblock_trace_' + ID + '.log'
 PATH_TO_FILTERED_LOG = '/home/shitong/Research/logs/log_' + ID + '/'
-PATH_TO_STAT_FILE = '/home/shitong/Research/logs/total_stat'
-PATH_TO_PROFILE = '/home/shitong/Research/profiles/profile' + ID
+PATH_TO_STAT_FILE    = '/home/shitong/Research/logs/total_stat'
+PATH_TO_PROFILE      = '/home/shitong/Research/profiles/profile' + ID
 
 # signals
 SIGSUCCESS = 1
@@ -67,6 +69,9 @@ KILL_TIMES = 5
 # threshold parameters
 DIFF_THRESHD_W_AB = 0
 DIFF_THRESHD_WO_AB = 0
+
+# URL for website list stored online
+URL_TO_ADB_LIST = 'https://raw.githubusercontent.com/shadowysean/anti-adblocker-list/master/anti-adb-evaluation-list.txt'
 
 # fake header
 FAKE_HEADER = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}

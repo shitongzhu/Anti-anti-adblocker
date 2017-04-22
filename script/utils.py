@@ -5,6 +5,7 @@ from time import gmtime, strftime
 from param import *
 import alexa
 from jsmodifier import *
+import requests
 
 
 def log_stat_collector(path_to_filtered_dir, path_to_stat_file):
@@ -48,9 +49,22 @@ def dump_alexa_sites(top_n):
     urllist = alexa.top_list(top_n)
     urllist = zip(*urllist)[1]
     urllist = map(lambda lne: lne + '\n', urllist)
-    print urllist
     with open(PATH_TO_URLFILE, 'w') as f:
         f.writelines(urllist)
+    f.close()
+
+
+def download_urllist(url_to_list):
+    r = requests.get(url=url_to_list)
+    curr_id = ID
+    urllist = r.text.split()
+    urllist = map(lambda lne: lne + '\n', urllist)
+    num_of_instances = len(os.listdir(os.getcwd()))
+    urllist = urllist[len(urllist) / num_of_instances *
+        int(curr_id):len(urllist) / num_of_instances * (int(curr_id) + 1)]
+    with open(PATH_TO_URLFILE, 'w') as f:
+        f.writelines(urllist)
+    f.close()
 
 
 def log_stat_analyzer(path_to_filtered_dir):
@@ -137,7 +151,8 @@ def sync_list_file(path_to_urllist):
 
 if __name__ == '__main__':
     #log_stat_collector(PATH_TO_FILTERED_LOG, PATH_TO_STAT_FILE)
-    js_dict = single_log_stat_analyzer(PATH_TO_FILTERED_LOG + 'kbb.com')
+    #js_dict = single_log_stat_analyzer(PATH_TO_FILTERED_LOG + 'kbb.com')
     #print js_dict
-    dispatch_urls(js_dict)
+    #dispatch_urls(js_dict)
     #dump_alexa_sites(N_TOP_ALEXA)
+    download_urllist(URL_TO_ADB_LIST)
