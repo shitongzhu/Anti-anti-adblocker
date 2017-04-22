@@ -10,12 +10,12 @@ curr_path = os.getcwd()
 ID = curr_path[-1]
 
 # paths
-PATH_TO_CHROMIUM     = '~/Research/releases/Release_' + ID + '/chrome'
+PATH_TO_CHROMIUM     = '../../releases/Release_' + ID + '/chrome'
 PATH_TO_URLFILE      = 'res/scanning_list'
 PATH_TO_LOG          = '/tmp/adblock_trace_' + ID + '.log'
-PATH_TO_FILTERED_LOG = '~/Research/logs/log_' + ID + '/'
-PATH_TO_STAT_FILE    = '~/Research/logs/total_stat'
-PATH_TO_PROFILE      = '~/Research/profiles/profile' + ID
+PATH_TO_FILTERED_LOG = '../../logs/log_' + ID + '/'
+PATH_TO_STAT_FILE    = '../../logs/total_stat'
+PATH_TO_PROFILE      = '../../profiles/profile' + ID
 
 # signals
 SIGSUCCESS = 1
