@@ -60,7 +60,7 @@ def download_urllist(url_to_list):
     curr_id = ID
     urllist = r.text.split()
     urllist = map(lambda lne: lne + '\n', urllist)
-    num_of_instances = len(os.listdir(os.getcwd()))
+    num_of_instances = len(os.listdir(os.getcwd() + '/../'))
     urllist = urllist[len(urllist) / num_of_instances *
         int(curr_id):len(urllist) / num_of_instances * (int(curr_id) + 1)]
     with open(PATH_TO_URLFILE, 'w') as f:
