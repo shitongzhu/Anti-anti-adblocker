@@ -4,6 +4,7 @@ from lxml import html
 from bs4 import BeautifulSoup
 from param import *
 import os
+import copy
 from ssl import SSLError
 
 
@@ -18,28 +19,33 @@ def dispatch_urls(scripts_dict, curr_site_dir):
     '''
     curr_site_js_dir = curr_site_dir + 'modified_js/'
     replace_res = open(curr_site_dir + 'replace_res', 'w+')
-    if scripts_dict is not None:
+    if scripts_dict:
         for key, val in scripts_dict.iteritems():
             js_url = key[1:][:-1]
-            print '[INFO][modify] Now modifying script ' + js_url + '...'
+            print '[INFO][modify] Now modifying script/html ' + js_url + '...'
             modified_fname = 'modified_file_' + str(int(time.time() * 100))
             replace_res.write(js_url + ' -> ' + modified_fname + ' | ' + str(len(val)) + ' replacement(s)\n')
             source = fetch_source(js_url)
+            source_copy = copy.copy(source)
             if source == -1:
                 continue
             for pos, count in reversed(sorted(val.iteritems())):
                 js_pos = pos
                 print '[INFO][modify] Now we are at offset ' + js_pos + '...'
                 source, begin, expr, idx = modify_expr(source, js_pos)
-                source = add_temp_var(source, begin, expr)
-                replace_res.write('expr: ' + expr + ' | index: ' + str(idx) + ' | offset: ' + js_pos + '\n')
+                if idx is None:
+                    replace_res.write("ERROR: no 'if' condition at offset " + js_pos + ' found!\n')
+                else:
+                    source = add_temp_var(source, begin, expr)
+                    replace_res.write('expr: ' + expr + ' | index: ' + str(idx) + ' | offset: ' + js_pos + '\n')
             replace_res.write('\n')
             if not os.path.exists(curr_site_js_dir):
                 print '[INFO][modify] Now creating the folder ' + curr_site_js_dir + '...'
                 os.mkdir(curr_site_js_dir)
-            js_file = open(curr_site_js_dir + modified_fname, 'w+')
-            js_file.write(source.encode('utf8'))
-            js_file.close()
+            if source != source_copy:
+                js_file = open(curr_site_js_dir + modified_fname, 'w+')
+                js_file.write(source.encode('utf8'))
+                js_file.close()
     else:
         print '[INFO][modify] No script to replace!'
     replace_res.close()
@@ -49,7 +55,7 @@ def fetch_source(url):
     try:
         r = requests.get(url=url, headers=FAKE_HEADER)
     except SSLError:
-        print '[ERROR][modify] SSL error found, no response'
+        print '[ERROR][modify] SSL error found, no response fetched!'
         return -1
     if r.status_code != 200:
         return -1
@@ -83,7 +89,9 @@ def modify_expr(source, stmt_offset):
                 target_script_idx = i
         if target_script_idx == -1:
             print "[ERROR][modify] No 'if' stmt accurately matched!"
-        idx = stmt_offset + source.find(scripts[target_script_idx].text)
+            return source, None, None, None
+        else:
+            idx = stmt_offset + source.find(scripts[target_script_idx].text)
     while source[idx] != '(' and idx + 1 <= len(source):
         idx += 1
     begin = idx
@@ -117,4 +125,4 @@ def add_temp_var(source, begin_idx, expr):
     return source_modified
 
 if __name__ == '__main__':
-    modify_expr(requests.get('https://s1.kbb.com/static/js/global/site-js-top?v=LodAQqs8UK81Hn3e4bPYSoX4X86clCR7IelLcy-9_UA1').text, 246344)
+    modify_expr(requests.get('https://www.game-state.com/').text, 3493)

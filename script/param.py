@@ -3,12 +3,11 @@
 
 import os
 
+# infer our browser id based on working directory
 curr_path = os.getcwd()
-print curr_path
 
 # browser id
 ID = curr_path[-1]
-print ID
 
 # paths
 PATH_TO_CHROMIUM     = '/home/shitong/Research/releases/Release_' + ID + '/chrome'
@@ -35,7 +34,7 @@ YES_KEYWORDS = [
 # number of runs stuff
 #NUM_OF_RUNS_W_AB = 2
 #NUM_OF_RUNS_WO_AB = 2
-NUM_OF_RUNS = 3
+NUM_OF_RUNS = 1
 N_TOP_ALEXA = 1000
 
 # flags
@@ -57,7 +56,7 @@ TIMEOUT_LOAD_WO_AB = 30
 
 TIMEOUT_WARMING = 5
 
-# command switches for starting Chromium enabled/disabled
+# command switches for starting Chromium with ABD enabled/disabled
 OPT_W_AB = [PATH_TO_CHROMIUM, '--no-sandbox', '--user-data-dir=' + PATH_TO_PROFILE]
 OPT_WO_AB = [PATH_TO_CHROMIUM, '--no-sandbox', '--disable-extensions', '--user-data-dir=' + PATH_TO_PROFILE]
 
@@ -74,4 +73,4 @@ DIFF_THRESHD_WO_AB = 0
 URL_TO_ADB_LIST = 'https://raw.githubusercontent.com/shadowysean/anti-adblocker-list/master/anti-adb-evaluation-list.txt'
 
 # fake header
-FAKE_HEADER = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+FAKE_HEADER = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2529.0 Safari/537.36'}

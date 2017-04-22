@@ -3,7 +3,7 @@ import re
 import operator
 from time import gmtime, strftime
 from param import *
-import alexa
+#import alexa
 from jsmodifier import *
 import requests
 
@@ -45,6 +45,7 @@ def log_stat_collector(path_to_filtered_dir, path_to_stat_file):
     fstat.close()
 
 
+'''
 def dump_alexa_sites(top_n):
     urllist = alexa.top_list(top_n)
     urllist = zip(*urllist)[1]
@@ -52,7 +53,7 @@ def dump_alexa_sites(top_n):
     with open(PATH_TO_URLFILE, 'w') as f:
         f.writelines(urllist)
     f.close()
-
+'''
 
 def download_urllist(url_to_list):
     r = requests.get(url=url_to_list)
