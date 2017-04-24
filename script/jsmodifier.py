@@ -21,7 +21,7 @@ def dispatch_urls(scripts_dict, curr_site_dir):
     replace_res = open(curr_site_dir + 'replace_res', 'w+')
     if scripts_dict:
         for key, val in scripts_dict.iteritems():
-            js_url = key[1:][:-1]
+            js_url = key
             print '[INFO][modify] Now modifying script/html ' + js_url + '...'
             modified_fname = 'modified_file_' + str(int(time.time() * 100))
             replace_res.write(js_url + ' -> ' + modified_fname + ' | ' + str(len(val)) + ' replacement(s)\n')

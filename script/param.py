@@ -34,7 +34,7 @@ YES_KEYWORDS = [
 # number of runs stuff
 #NUM_OF_RUNS_W_AB = 2
 #NUM_OF_RUNS_WO_AB = 2
-NUM_OF_RUNS = 1
+NUM_OF_RUNS = 3
 N_TOP_ALEXA = 1000
 
 # flags
@@ -42,8 +42,8 @@ FLAG_W_AB = 0
 FLAG_WO_AB = 1
 
 # regex pattern to match log record
-PATTERN_LOG = r'(\"http\S*\")\s(IF|THEN|ELSE)\s(\d*)(\s-1|)'
-PATTERN_DIFF_REC = r'unmatched: pos (\"\S*\")(\d*)'
+PATTERN_LOG = r'\S* <String\[\d*\]: (http\S*)>\s(IF|THEN|ELSE)\s(\d*)(\s-1|)'
+PATTERN_DIFF_REC = r'unmatched: pos (\S*) (\d*)'
 
 # position-wise flags
 THIS_POS_ONLY_HAS_IF = 0
@@ -51,10 +51,10 @@ THIS_POS_HAS_IF_THEN = 1
 THIS_POS_HAS_IF_ELSE = 2
 
 # timeout for loading pages (by sec)
-TIMEOUT_LOAD_W_AB = 120
-TIMEOUT_LOAD_WO_AB = 30
+TIMEOUT_LOAD_W_AB = 30
+TIMEOUT_LOAD_WO_AB = 20
 
-TIMEOUT_WARMING = 5
+TIMEOUT_WARMING = 3
 
 # command switches for starting Chromium with ABD enabled/disabled
 OPT_W_AB = [PATH_TO_CHROMIUM, '--no-sandbox', '--user-data-dir=' + PATH_TO_PROFILE]

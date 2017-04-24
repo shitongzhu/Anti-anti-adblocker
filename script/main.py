@@ -107,9 +107,9 @@ def log_differ(path_to_dir, flag_mode):
                 regex_match(lst[idx - 1]), regex_match(lst[idx]), regex_match(lst[idx + 1])
             if reg_group_curr is None or reg_group_next is None or reg_group_prev is None:
                 continue
-            trace_key_curr = reg_group_curr[0] + reg_group_curr[2]
-            trace_key_next = reg_group_next[0] + reg_group_next[2]
-            trace_key_prev = reg_group_prev[0] + reg_group_prev[2]
+            trace_key_curr = reg_group_curr[0] + ' ' + reg_group_curr[2]
+            trace_key_next = reg_group_next[0] + ' ' + reg_group_next[2]
+            trace_key_prev = reg_group_prev[0] + ' ' + reg_group_prev[2]
 
             if reg_group_curr[1] == 'IF':
                 if trace_key_curr != trace_key_next \
