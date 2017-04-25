@@ -184,38 +184,44 @@ def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab):
 
 if __name__ == '__main__':
     while url_reader(PATH_TO_URLFILE):
-        url = url_reader(PATH_TO_URLFILE)
         try:
-            shutil.rmtree(PATH_TO_FILTERED_LOG + url)
-        except OSError as err:
-            print "[INFO][looper] No existing directory"
-        else:
-            print "[INFO][looper] Deleted duplicate directory"
-        # 1st pass, with adblock enabled
-        # tick its runtime
-        for i in range(NUM_OF_RUNS):
-            p0 = url_loader(None, is_with_ext=True)
-            time.sleep(TIMEOUT_WARMING)
-            p1 = url_loader(url, is_with_ext=True)
-            time.sleep(TIMEOUT_LOAD_W_AB)
-            p0.kill()
-            p1.kill()
-            site_dir1 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_W_AB)
+            url = url_reader(PATH_TO_URLFILE)
+            try:
+                shutil.rmtree(PATH_TO_FILTERED_LOG + url)
+            except OSError as err:
+                print "[INFO][looper] No existing directory"
+            else:
+                print "[INFO][looper] Deleted duplicate directory"
+            # 1st pass, with adblock enabled
+            # tick its runtime
+            for i in range(NUM_OF_RUNS):
+                p0 = url_loader(None, is_with_ext=True)
+                time.sleep(TIMEOUT_WARMING)
+                p1 = url_loader(url, is_with_ext=True)
+                time.sleep(TIMEOUT_LOAD_W_AB)
+                p0.kill()
+                p1.kill()
+                site_dir1 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_W_AB)
 
-            # 2nd pass, with adblock disabled
-            p2 = url_loader(url, is_with_ext=False)
-            time.sleep(TIMEOUT_LOAD_WO_AB)
-            p2.kill()
-            site_dir2 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB)
-        hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB)
-        hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB)
-        curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
-        res_flag = log_reporter(curr_site_dir, hashtable1, hashtable2)
-        js_dict = {}
+                # 2nd pass, with adblock disabled
+                p2 = url_loader(url, is_with_ext=False)
+                time.sleep(TIMEOUT_LOAD_WO_AB)
+                p2.kill()
+                site_dir2 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB)
+            hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB)
+            hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB)
+            curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
+            res_flag = log_reporter(curr_site_dir, hashtable1, hashtable2)
+            js_dict = {}
 
-        js_dict = single_log_stat_analyzer(curr_site_dir)
-        dispatch_urls(js_dict, curr_site_dir)
-        sync_list_file(PATH_TO_URLFILE)
-        print '[INFO][looper] This site is done\n'
+            js_dict = single_log_stat_analyzer(curr_site_dir)
+            dispatch_urls(js_dict, curr_site_dir)
+            sync_list_file(PATH_TO_URLFILE)
+            print '[INFO][looper] This site is done\n'
+        except Exception as e:
+            visit_log = open(PATH_TO_FILTERED_LOG + url + '/visit_log', 'w')
+            visit_log.write(str(e))
+            visit_log.close()
+            continue
 
     print '[INFO][looper] A batch of experiment is done!'
