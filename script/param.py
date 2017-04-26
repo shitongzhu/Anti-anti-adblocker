@@ -34,7 +34,7 @@ YES_KEYWORDS = [
 # number of runs stuff
 #NUM_OF_RUNS_W_AB = 2
 #NUM_OF_RUNS_WO_AB = 2
-NUM_OF_RUNS = 1
+NUM_OF_RUNS = 3
 N_TOP_ALEXA = 1000
 
 # flags
