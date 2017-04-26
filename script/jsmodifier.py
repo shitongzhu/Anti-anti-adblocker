@@ -94,6 +94,7 @@ def modify_expr(source, stmt_offset):
             return False
         else:
             print '[ERROR][modify] Source type check failed: this document is of type ' + tree.tag
+
     stack = []
     target_script_idx = -1
     offset_pattern = re.compile(OFFSET_INFO)
@@ -101,21 +102,6 @@ def modify_expr(source, stmt_offset):
                         int(regexp_offset(stmt_offset)[1]), int(regexp_offset(stmt_offset)[2])
     idx = stmt_offset
     if x != 0 or y != 0:
-        '''
-        soup = BeautifulSoup(source, "lxml")
-        scripts = soup.find_all('script')
-        for i in range(len(scripts)):
-            curr_script = scripts[i].text
-            if stmt_offset + 2 > len(curr_script):
-                continue
-            if curr_script[stmt_offset:stmt_offset + 2] == 'if':
-                target_script_idx = i
-        if target_script_idx == -1:
-            print "[ERROR][modify] No 'if' stmt accurately matched!"
-            return source, None, None, None
-        else:
-            idx = stmt_offset + source.find(scripts[target_script_idx].text)
-        '''
         idx = convert_to_global(source, x, y, stmt_offset)
         if source[idx:idx + 2] != 'if':
             soup = BeautifulSoup(source, "lxml")
@@ -166,7 +152,7 @@ def add_temp_var(source, begin_idx, expr):
         idx -= 1
         if idx < 0:
             print "[ERROR][modify] Beginning of the source reached, but no 'if' found!"
-    source_modified = source[:idx] + 'temp_var_' + str(int(time.time() * 100)) + '=' + expr + ';' + source[idx:]
+    source_modified = source[:idx] + 'temp_var_' + str(int(time.time() * 100)) + '=' + expr + '; ' + source[idx:]
     return source_modified
 
 if __name__ == '__main__':
