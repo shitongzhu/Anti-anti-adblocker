@@ -12,7 +12,7 @@ ID = curr_path[-1]
 # paths
 PATH_TO_CHROMIUM     = '../../releases/Release_' + ID + '/chrome'
 PATH_TO_URLFILE      = 'res/scanning_list'
-PATH_TO_LOG          = '/tmp/adblock_trace_' + ID + '.log'
+PATH_TO_LOG          = '/tmp/adblockJSLog' + ID + '.txt'
 PATH_TO_FILTERED_LOG = '../../logs/log_' + ID + '/'
 PATH_TO_STAT_FILE    = '../../logs/total_stat'
 PATH_TO_PROFILE      = '../../profiles/profile' + ID
@@ -42,17 +42,20 @@ FLAG_W_AB = 0
 FLAG_WO_AB = 1
 
 # regex pattern to match log record
-PATTERN_LOG = r'\S* <String\[\d*\]: (http\S*)>\s(IF|THEN|ELSE)\s(\d*)(\s-1|)'
+PATTERN_LOG = r'\((\d*),(\d*)\) \S* <String\[\d*\]: (http\S*)>\s(IF|THEN|ELSE|ConditionalStatement|ConditionalStatementTrue|ConditionalStatementFalse) (\d*)(\s-1|)'
+NEW_PATTERN_LOG = r'(\S*) (IF|THEN|ELSE|ConditionalStatement|ConditionalStatementTrue|ConditionalStatementFalse) (x\d*y\d*o\d*)'
 PATTERN_DIFF_REC = r'unmatched: pos (\S*) (\d*)'
 
 # position-wise flags
 THIS_POS_ONLY_HAS_IF = 0
 THIS_POS_HAS_IF_THEN = 1
 THIS_POS_HAS_IF_ELSE = 2
+THIS_POS_HAS_COND_TRUE = 3
+THIS_POS_HAS_COND_FALSE = 4
 
 # timeout for loading pages (by sec)
-TIMEOUT_LOAD_W_AB = 30
-TIMEOUT_LOAD_WO_AB = 20
+TIMEOUT_LOAD_W_AB = 17
+TIMEOUT_LOAD_WO_AB = 12
 
 TIMEOUT_WARMING = 3
 

@@ -57,14 +57,18 @@ def log_extractor(path_to_log, flag_mode):
                 return True
         return False
 
-    def func_regex(line):
-        if re.match(log_pattern, line):
-            return True
+    def func_transform(line):
+        reg_match = re.match(log_pattern, line)
+        if reg_match:
+            reg_group = reg_match.groups()
+            script_url, stmt_type, position = \
+                reg_group[2], reg_group[3], 'x' + reg_group[0] + 'y' + reg_group[1] + 'o' + reg_group[4]
+            return script_url + ' ' + stmt_type + ' ' + position + '\n'
         else:
-            return False
+            return None
 
     def filter_by_kword(lst):
-        return [line for line in lst if func_regex(line)]
+        return [func_transform(line) for line in lst if func_transform(line)]
 
     log = load(path_to_log)
     log_pattern = re.compile(PATTERN_LOG)
@@ -85,7 +89,7 @@ def log_differ(path_to_dir, flag_mode):
     files = []
     grand_dict = {}
     run_count = 0
-    log_pattern = re.compile(PATTERN_LOG)
+    log_pattern = re.compile(NEW_PATTERN_LOG)
     blklist = set()
     for fname in os.listdir(path_to_dir):
         files.append(path_to_dir + fname)
@@ -146,6 +150,22 @@ def log_differ(path_to_dir, flag_mode):
                     blklist.discard(trace_key_curr)
                 else:
                     if grand_dict[trace_key_curr][0] != THIS_POS_HAS_IF_ELSE:
+                        blklist.add(trace_key_curr)
+                    else:
+                        grand_dict[trace_key_curr][1].add(run_count)
+            elif reg_group_curr[1] == 'ConditionalStatementTrue':
+                if grand_dict.get(trace_key_curr, -1) == -1:
+                    grand_dict[trace_key_curr] = [THIS_POS_HAS_COND_TRUE, {run_count}]
+                else:
+                    if grand_dict[trace_key_curr][0] != THIS_POS_HAS_COND_TRUE:
+                        blklist.add(trace_key_curr)
+                    else:
+                        grand_dict[trace_key_curr][1].add(run_count)
+            elif reg_group_curr[1] == 'ConditionalStatementFalse':
+                if grand_dict.get(trace_key_curr, -1) == -1:
+                    grand_dict[trace_key_curr] = [THIS_POS_HAS_COND_FALSE, {run_count}]
+                else:
+                    if grand_dict[trace_key_curr][0] != THIS_POS_HAS_COND_FALSE:
                         blklist.add(trace_key_curr)
                     else:
                         grand_dict[trace_key_curr][1].add(run_count)
@@ -219,9 +239,12 @@ if __name__ == '__main__':
             sync_list_file(PATH_TO_URLFILE)
             print '[INFO][looper] This site is done\n'
         except Exception as e:
-            visit_log = open(PATH_TO_FILTERED_LOG + url + '/visit_log', 'w')
-            visit_log.write(str(e))
-            visit_log.close()
+            error_msg = '[FATAL][looper] ' + str(e)
+            print(error_msg)
+            error_log = open(PATH_TO_FILTERED_LOG + url + '/error_log', 'w')
+            error_log.write(str(error_msg))
+            error_log.close()
+            sync_list_file(PATH_TO_URLFILE)
             continue
 
-    print '[INFO][looper] A batch of experiment is done!'
+    print '[INFO][looper] A batch of experiments are done!'
