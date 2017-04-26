@@ -237,7 +237,7 @@ if __name__ == '__main__':
             js_dict = single_log_stat_analyzer(curr_site_dir)
             dispatch_urls(js_dict, curr_site_dir)
             sync_list_file(PATH_TO_URLFILE)
-            print '[INFO][looper] This site is done'
+            print '[INFO][looper] This site is done\n'
         except Exception as e:
             error_msg = '[FATAL][looper] ' + str(e)
             print(error_msg)
