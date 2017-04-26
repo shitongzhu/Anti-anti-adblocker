@@ -21,7 +21,7 @@ def log_stat_collector(path_to_filtered_dir, path_to_stat_file):
             print '[INFO][util] ' + fname + " is not yet finished"
             continue
         diff_content = diff_file.readlines()
-        if diff_content[0] == 'no unmatch detected!\n':
+        if diff_content[0] == 'No unmatch detected!\n':
             curr_negative.add(fname)
         else:
             curr_positive.add(fname)
@@ -123,7 +123,7 @@ def single_log_stat_analyzer(path_to_site_dir):
         print '[INFO][util] ' + path_to_site_dir.split('/')[:-1] + " is not yet finished!"
         return None
     diff_content = diff_file.readlines()
-    if diff_content[0] == 'no unmatch detected!\n':
+    if diff_content[0] == 'No unmatch detected!\n':
         return None
     else:
         for l in diff_content:
@@ -131,6 +131,9 @@ def single_log_stat_analyzer(path_to_site_dir):
             stat_reg_group = stat_reg_match.groups()
             js_url = str(stat_reg_group[0])
             js_pos = str(stat_reg_group[1])
+            js_type = int(stat_reg_group[2]) * int(stat_reg_group[3])
+            if js_type > 4:
+                continue
             if js_url not in js_dict:
                 js_dict[js_url] = dict()
                 js_dict[js_url][js_pos] = 1

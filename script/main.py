@@ -191,13 +191,13 @@ def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab):
             continue
         if curr_val[0] != value[0]:
             flag_flipping = True
-            match_mark = "unmatched: pos " + str(key) + " abp-on " + str(dict_w_ab.get(key, -1)) \
+            match_mark = "Unmatched: pos " + str(key) + " abp-on " + str(dict_w_ab.get(key, -1)) \
                          + " abp-off " + str(dict_wo_ab.get(key, -1))
             f.write(match_mark + '\n')
             print '[INFO][looper] ' + match_mark
     if flag_flipping is False:
         print "[INFO][looper] No unmatch detected!"
-        f.write('no unmatch detected!\n')
+        f.write('No unmatch detected!\n')
     f.close()
     return flag_flipping is True
 
@@ -237,7 +237,7 @@ if __name__ == '__main__':
             js_dict = single_log_stat_analyzer(curr_site_dir)
             dispatch_urls(js_dict, curr_site_dir)
             sync_list_file(PATH_TO_URLFILE)
-            print '[INFO][looper] This site is done\n'
+            print '[INFO][looper] This site is done'
         except Exception as e:
             error_msg = '[FATAL][looper] ' + str(e)
             print(error_msg)

@@ -6,17 +6,23 @@ from param import *
 import os
 import copy
 from ssl import SSLError
+import re
 
 
 def dispatch_urls(scripts_dict, curr_site_dir):
-    '''
-    def count_offset(text, script_idx, oft_before_tag, oft_after_tag):
-        total_oft = 0
-        text_by_line = text.splitlines()
-        for i in range(script_idx):
-            total_oft += text_by_line[i] + 1
-        return total_oft + oft_before_tag + oft_after_tag
-    '''
+    def convert_to_global(source, x, y, local_oft):
+        glob = 0
+        x, y, local_oft = int(x), int(y), int(local_oft)
+        for i in range(x):
+            glob += len(source.splitlines()[i]) + 1
+        return glob + y + local_oft
+
+    def regexp_offset(line):
+        reg_match = re.match(offset_pattern, line)
+        reg_group = reg_match.groups()
+        return reg_group
+
+    offset_pattern = re.compile(OFFSET_INFO)
     curr_site_js_dir = curr_site_dir + 'modified_js/'
     replace_res = open(curr_site_dir + 'replace_res', 'w+')
     if scripts_dict:
@@ -29,7 +35,9 @@ def dispatch_urls(scripts_dict, curr_site_dir):
             source_copy = copy.copy(source)
             if source == -1:
                 continue
-            for pos, count in reversed(sorted(val.iteritems())):
+            for pos, count in reversed(sorted(val.iteritems(), key=lambda (k, v): convert_to_global(
+                source, regexp_offset(k)[0], regexp_offset(k)[1], regexp_offset(k)[2]))
+            ):
                 js_pos = pos
                 print '[INFO][modify] Now we are at offset ' + js_pos + '...'
                 source, begin, expr, idx = modify_expr(source, js_pos)
@@ -64,6 +72,18 @@ def fetch_source(url):
 
 
 def modify_expr(source, stmt_offset):
+    def regexp_offset(line):
+        reg_match = re.match(offset_pattern, line)
+        reg_group = reg_match.groups()
+        return reg_group
+
+    def convert_to_global(source, x, y, local_oft):
+        glob = 0
+        x, y, local_oft = int(x), int(y), int(local_oft)
+        for i in range(x):
+            glob += len(source.splitlines()[i]) + 1
+        return glob + y + local_oft
+
     def is_html(source):
         tree = html.fromstring(source)
         if tree.tag == 'html':
@@ -76,9 +96,12 @@ def modify_expr(source, stmt_offset):
             print '[ERROR][modify] Source type check failed: this document is of type ' + tree.tag
     stack = []
     target_script_idx = -1
-    stmt_offset = int(stmt_offset)
-    idx = int(stmt_offset)
-    if is_html(source):
+    offset_pattern = re.compile(OFFSET_INFO)
+    x, y, stmt_offset = int(regexp_offset(stmt_offset)[0]), \
+                        int(regexp_offset(stmt_offset)[1]), int(regexp_offset(stmt_offset)[2])
+    idx = stmt_offset
+    if x != 0 or y != 0:
+        '''
         soup = BeautifulSoup(source, "lxml")
         scripts = soup.find_all('script')
         for i in range(len(scripts)):
@@ -92,6 +115,28 @@ def modify_expr(source, stmt_offset):
             return source, None, None, None
         else:
             idx = stmt_offset + source.find(scripts[target_script_idx].text)
+        '''
+        idx = convert_to_global(source, x, y, stmt_offset)
+        if source[idx:idx + 2] != 'if':
+            soup = BeautifulSoup(source, "lxml")
+            scripts = soup.find_all('script')
+            for i in range(len(scripts)):
+                curr_script = scripts[i].text
+                if stmt_offset + 2 > len(curr_script):
+                    continue
+                if curr_script[stmt_offset:stmt_offset + 2] == 'if':
+                    target_script_idx = i
+            if target_script_idx == -1:
+                print "[ERROR][modify] No 'if' stmt accurately matched!"
+                return source, None, None, None
+            else:
+                idx = stmt_offset + source.find(scripts[target_script_idx].text)
+        soup = BeautifulSoup(source, "lxml")
+        scripts = soup.find_all('script')
+        target_script_idx = len(scripts) - 1
+        for i in range(len(scripts) - 1):
+            if source.find(scripts[i].text) < idx < source.find(scripts[i + 1].text):
+                target_script_idx = i
     while source[idx] != '(' and idx + 1 <= len(source):
         idx += 1
     begin = idx
