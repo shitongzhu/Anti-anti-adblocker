@@ -133,7 +133,7 @@ def single_log_stat_analyzer(path_to_site_dir):
             js_pos = str(stat_reg_group[1])
             js_type = int(stat_reg_group[2]) * int(stat_reg_group[3])
             if js_type > 4:
-                continue
+                js_pos = '[COND]' + js_pos
             if js_url not in js_dict:
                 js_dict[js_url] = dict()
                 js_dict[js_url][js_pos] = 1

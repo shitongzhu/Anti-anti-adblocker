@@ -32,9 +32,7 @@ YES_KEYWORDS = [
 ]
 
 # number of runs stuff
-#NUM_OF_RUNS_W_AB = 2
-#NUM_OF_RUNS_WO_AB = 2
-NUM_OF_RUNS = 3
+NUM_OF_RUNS = 1
 N_TOP_ALEXA = 1000
 
 # flags
@@ -45,7 +43,7 @@ FLAG_WO_AB = 1
 PATTERN_LOG = r'\((\d*),(\d*)\) \S* <String\[\d*\]: (http\S*)>\s(IF|THEN|ELSE|ConditionalStatement|ConditionalStatementTrue|ConditionalStatementFalse) (\d*)(\s-1|)'
 NEW_PATTERN_LOG = r'(\S*) (IF|THEN|ELSE|ConditionalStatement|ConditionalStatementTrue|ConditionalStatementFalse) (x\d*y\d*o\d*)'
 PATTERN_DIFF_REC = r'Unmatched: pos (\S*) (\S*) abp-on \[(\d*), set\(\[.*\]\)\] abp-off \[(\d*), set\(\[.*\]\)\]'
-OFFSET_INFO = r'x(\d*)y(\d*)o(\d*)'
+OFFSET_INFO = r'(\[COND\])?x(\d*)y(\d*)o(\d*)'
 
 # position-wise flags
 THIS_POS_ONLY_HAS_IF = 0

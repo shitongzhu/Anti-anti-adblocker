@@ -36,17 +36,27 @@ def dispatch_urls(scripts_dict, curr_site_dir):
             if source == -1:
                 continue
             for pos, count in reversed(sorted(val.iteritems(), key=lambda (k, v): convert_to_global(
-                source, regexp_offset(k)[0], regexp_offset(k)[1], regexp_offset(k)[2]))
+                source, regexp_offset(k)[1], regexp_offset(k)[2], regexp_offset(k)[3]))
             ):
                 js_pos = pos
+                js_pos_cleaned = 'x' + regexp_offset(js_pos)[1] + \
+                                 'y' + regexp_offset(js_pos)[2] + \
+                                 'o' + regexp_offset(js_pos)[3]
                 print '[INFO][modify] Now we are at offset ' + js_pos + '...'
-                source, begin, expr, idx = modify_expr(source, js_pos)
-                if idx is None:
-                    replace_res.write("ERROR: no 'if' condition at offset " + js_pos + ' found!\n')
+
+                # separate handling with conditional statements
+                if regexp_offset(js_pos)[0] == '[COND]':
+                    source, begin, expr, idx = modify_expr(source, js_pos, is_condstmt=True)
+                    replace_res.write('[CondStmt]' + ' index: ' + str(idx) + ' | offset: ' + js_pos_cleaned + '\n')
                 else:
-                    source = add_temp_var(source, begin, expr)
-                    replace_res.write('expr: ' + expr + ' | index: ' + str(idx) + ' | offset: ' + js_pos + '\n')
+                    source, begin, expr, idx = modify_expr(source, js_pos, is_condstmt=False)
+                    if idx is None:
+                        replace_res.write("ERROR: no 'if' condition at offset " + js_pos + ' found!\n')
+                    else:
+                        source = add_temp_var(source, begin, expr)
+                        replace_res.write('expr: ' + expr + ' | index: ' + str(idx) + ' | offset: ' + js_pos + '\n')
             replace_res.write('\n')
+
             if not os.path.exists(curr_site_js_dir):
                 print '[INFO][modify] Now creating the folder ' + curr_site_js_dir + '...'
                 os.mkdir(curr_site_js_dir)
@@ -71,7 +81,7 @@ def fetch_source(url):
         return r.text
 
 
-def modify_expr(source, stmt_offset):
+def modify_expr(source, stmt_offset, is_condstmt=False):
     def regexp_offset(line):
         reg_match = re.match(offset_pattern, line)
         reg_group = reg_match.groups()
@@ -98,12 +108,29 @@ def modify_expr(source, stmt_offset):
     stack = []
     target_script_idx = -1
     offset_pattern = re.compile(OFFSET_INFO)
-    x, y, stmt_offset = int(regexp_offset(stmt_offset)[0]), \
-                        int(regexp_offset(stmt_offset)[1]), int(regexp_offset(stmt_offset)[2])
+    x, y, stmt_offset = int(regexp_offset(stmt_offset)[1]), \
+                        int(regexp_offset(stmt_offset)[2]), \
+                        int(regexp_offset(stmt_offset)[3])
     idx = stmt_offset
+
+    # separate handling with conditional statement traces
+    if is_condstmt:
+        if x != 0 or y != 0:
+            idx = convert_to_global(source, x, y, stmt_offset)
+            soup = BeautifulSoup(source, "lxml")
+            scripts = soup.find_all('script')
+            target_script_idx = len(scripts) - 1
+            for i in range(len(scripts) - 1):
+                if source.find(scripts[i].text) < idx < source.find(scripts[i + 1].text):
+                    target_script_idx = i
+            return source, None, None, target_script_idx
+        else:
+            return source, None, None, -1
+
     if x != 0 or y != 0:
         idx = convert_to_global(source, x, y, stmt_offset)
         if source[idx:idx + 2] != 'if':
+            print "[ERROR][modify] Direct 'if' match failed, now secondary..."
             soup = BeautifulSoup(source, "lxml")
             scripts = soup.find_all('script')
             for i in range(len(scripts)):
