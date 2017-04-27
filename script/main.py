@@ -86,8 +86,20 @@ def log_extractor(path_to_log, flag_mode):
 
 
 def log_differ(path_to_dir, flag_mode):
+    def fetch_source(url):
+        try:
+            r = requests.get(url=url, headers=FAKE_HEADER)
+        except SSLError:
+            print '[ERROR][modify] SSL error found, no response fetched!'
+            return -1
+        if r.status_code != 200:
+            return -1
+        else:
+            return r.text
+
     files = []
     grand_dict = {}
+    html_cache = {}
     run_count = 0
     log_pattern = re.compile(NEW_PATTERN_LOG)
     blklist = set()
@@ -114,6 +126,9 @@ def log_differ(path_to_dir, flag_mode):
             trace_key_curr = reg_group_curr[0] + ' ' + reg_group_curr[2]
             trace_key_next = reg_group_next[0] + ' ' + reg_group_next[2]
             trace_key_prev = reg_group_prev[0] + ' ' + reg_group_prev[2]
+
+            if reg_group_curr[2].startswith('x0y0'):
+                convert_to_global
 
             if reg_group_curr[1] == 'IF':
                 if trace_key_curr != trace_key_next \
