@@ -14,8 +14,11 @@ def dispatch_urls(scripts_dict, curr_site_dir):
         glob = 0
         x, y, local_oft = int(x), int(y), int(local_oft)
         for i in range(x):
-            glob += len(source.splitlines()[i]) + 1
-        return glob + y + local_oft
+            glob += len(source.splitlines(True)[i])
+        start_of_stmt = glob + y + local_oft
+        while source[start_of_stmt].strip() != source[start_of_stmt]:
+            start_of_stmt += 1
+        return start_of_stmt
 
     def regexp_offset(line):
         reg_match = re.match(offset_pattern, line)
@@ -91,9 +94,13 @@ def modify_expr(source, stmt_offset, is_condstmt=False):
         glob = 0
         x, y, local_oft = int(x), int(y), int(local_oft)
         for i in range(x):
-            glob += len(source.splitlines()[i]) + 1
-        return glob + y + local_oft
+            glob += len(source.splitlines(True)[i])
+        start_of_stmt = glob + y + local_oft
+        while source[start_of_stmt].strip() != source[start_of_stmt]:
+            start_of_stmt += 1
+        return start_of_stmt
 
+    # now that we already have the in-page index, this helper function is deprecated
     def is_html(source):
         tree = html.fromstring(source)
         if tree.tag == 'html':
@@ -126,51 +133,51 @@ def modify_expr(source, stmt_offset, is_condstmt=False):
             return source, None, None, target_script_idx
         else:
             return source, None, None, -1
-
-    if x != 0 or y != 0:
-        idx = convert_to_global(source, x, y, stmt_offset)
-        if source[idx:idx + 2] != 'if':
-            print "[ERROR][modify] Direct 'if' match failed, now secondary..."
+    else:
+        if x != 0 or y != 0:
+            idx = convert_to_global(source, x, y, stmt_offset)
+            if source[idx:idx + 2] != 'if':
+                print "[ERROR][modify] Direct 'if' match failed, now secondary..."
+                soup = BeautifulSoup(source, "lxml")
+                scripts = soup.find_all('script')
+                for i in range(len(scripts)):
+                    curr_script = scripts[i].text
+                    if stmt_offset + 2 > len(curr_script):
+                        continue
+                    if curr_script[stmt_offset:stmt_offset + 2] == 'if':
+                        target_script_idx = i
+                if target_script_idx == -1:
+                    print "[ERROR][modify] No 'if' stmt accurately matched!"
+                    return source, None, None, None
+                else:
+                    idx = stmt_offset + source.find(scripts[target_script_idx].text)
             soup = BeautifulSoup(source, "lxml")
             scripts = soup.find_all('script')
-            for i in range(len(scripts)):
-                curr_script = scripts[i].text
-                if stmt_offset + 2 > len(curr_script):
-                    continue
-                if curr_script[stmt_offset:stmt_offset + 2] == 'if':
+            target_script_idx = len(scripts) - 1
+            for i in range(len(scripts) - 1):
+                if source.find(scripts[i].text) < idx < source.find(scripts[i + 1].text):
                     target_script_idx = i
-            if target_script_idx == -1:
-                print "[ERROR][modify] No 'if' stmt accurately matched!"
-                return source, None, None, None
-            else:
-                idx = stmt_offset + source.find(scripts[target_script_idx].text)
-        soup = BeautifulSoup(source, "lxml")
-        scripts = soup.find_all('script')
-        target_script_idx = len(scripts) - 1
-        for i in range(len(scripts) - 1):
-            if source.find(scripts[i].text) < idx < source.find(scripts[i + 1].text):
-                target_script_idx = i
-    while source[idx] != '(' and idx + 1 <= len(source):
+        while source[idx] != '(' and idx + 1 <= len(source):
+            idx += 1
+        begin = idx
         idx += 1
-    begin = idx
-    idx += 1
-    stack.append(source[begin])
-    while stack and idx < len(source):
-        if source[idx] == '(':
-            stack.append(source[idx])
-        elif source[idx] == ')':
-            if stack == [] or stack.pop() != '(':
-                print '[ERROR][modify] Invalid parenthesis!'
-                return -1
-        idx += 1
-    end = idx
-    if stack:
-        print '[ERROR][modify] Invalid parenthesis!'
-        return -1
-    expr = source[begin:end]
-    source = source[:begin] + '(false)' + source[end:]
-    print '[INFO][modify] ' + expr + ' is the identified and extracted conditional expression'
-    return source, begin, expr, target_script_idx
+        stack.append(source[begin])
+        while stack and idx < len(source):
+            if source[idx] == '(':
+                stack.append(source[idx])
+            elif source[idx] == ')':
+                if stack == [] or stack.pop() != '(':
+                    print '[ERROR][modify] Invalid parenthesis!'
+                    return -1
+            idx += 1
+        end = idx
+        if stack:
+            print '[ERROR][modify] Invalid parenthesis!'
+            return -1
+        expr = source[begin:end]
+        source = source[:begin] + '(false)' + source[end:]
+        print '[INFO][modify] ' + expr + ' is the identified and extracted conditional expression'
+        return source, begin, expr, target_script_idx
 
 
 def add_temp_var(source, begin_idx, expr):
@@ -183,4 +190,4 @@ def add_temp_var(source, begin_idx, expr):
     return source_modified
 
 if __name__ == '__main__':
-    modify_expr(requests.get('https://www.game-state.com/').text, 3493)
+    modify_expr(requests.get('http://aiondatabase.net/us/').text, 'x729y33o5')
