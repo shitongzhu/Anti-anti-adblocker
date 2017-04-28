@@ -34,7 +34,7 @@ def url_loader(url, is_with_ext):
     return subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
 
 
-def log_extractor(path_to_log, flag_mode):
+def log_extractor(path_to_log, flag_mode, url):
     def load(path_to_file):
         f = open(path_to_file, 'r')
         lst = f.readlines()
@@ -212,13 +212,13 @@ def main_loop():
                 time.sleep(TIMEOUT_LOAD_W_AB)
                 p0.kill()
                 p1.kill()
-                site_dir1 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_W_AB)
+                site_dir1 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_W_AB, url=url)
 
                 # 2nd pass, with adblock disabled
                 p2 = url_loader(url, is_with_ext=False)
                 time.sleep(TIMEOUT_LOAD_WO_AB)
                 p2.kill()
-                site_dir2 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB)
+                site_dir2 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB, url=url)
             cache = SignatureMapping()
             hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
             hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)

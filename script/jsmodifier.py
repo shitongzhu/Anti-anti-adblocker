@@ -75,7 +75,7 @@ def dispatch_urls(scripts_dict, curr_site_dir):
 def fetch_source(url):
     try:
         r = requests.get(url=url, headers=FAKE_HEADER)
-    except SSLError:
+    except Exception:
         print '[ERROR][modify] SSL error found, no response fetched!'
         return -1
     if r.status_code != 200:

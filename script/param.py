@@ -15,7 +15,7 @@ PATH_TO_URLFILE      = '../../res/urllist.txt'
 PATH_TO_LOG          = '/tmp/adblockJSLog' + ID + '.txt'
 PATH_TO_FILTERED_LOG = '../../logs/log' + ID + '/'
 PATH_TO_STAT_FILE    = '../../logs/total_stat'
-PATH_TO_PROFILE      = '../../profiles/profile' + ID
+PATH_TO_PROFILE      = '../../profiles/profile' + ID + '/Default'
 
 # signals
 SIGSUCCESS = 1
