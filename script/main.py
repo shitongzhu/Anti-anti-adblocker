@@ -8,6 +8,7 @@ import shutil
 from param import *
 from utils import *
 from SignatureMapping import SignatureMapping
+import traceback
 
 
 def url_reader(path_to_urllist):
@@ -181,7 +182,7 @@ def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab, mapping):
             continue
         if curr_val[0] != value[0]:
             flag_flipping = True
-            match_mark = "Unmatched: pos " + mapping.mapping_to_full(str(key)) + " abp-on " + str(dict_w_ab.get(key, -1)) \
+            match_mark = "Unmatched: pos " + mapping.map_to_full(str(key)) + " abp-on " + str(dict_w_ab.get(key, -1)) \
                          + " abp-off " + str(dict_wo_ab.get(key, -1))
             f.write(match_mark + '\n')
             print '[INFO][looper] ' + match_mark
@@ -230,6 +231,7 @@ if __name__ == '__main__':
             print '[INFO][looper] This site is done\n'
         except Exception as e:
             error_msg = '[FATAL][looper] ' + str(e)
+            traceback.print_exc()
             print(error_msg)
             error_log = open(PATH_TO_FILTERED_LOG + url + '/error_log', 'w')
             error_log.write(str(error_msg))

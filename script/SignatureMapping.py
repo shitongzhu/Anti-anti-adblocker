@@ -28,8 +28,8 @@ class SignatureMapping(object):
         group = re.match(self.full_pattern, full_sig).groups()
         compact_sig = group[0] + ' o' + group[3]
         self.create_mapping(full_sig, compact_sig)
+        return compact_sig
 
     def map_to_full(self, compact_sig):
         assert isinstance(compact_sig, str)
-        print self.mapping_to_full[compact_sig]
         return self.mapping_to_full[compact_sig]
