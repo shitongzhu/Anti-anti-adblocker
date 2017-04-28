@@ -152,7 +152,6 @@ def sync_list_file(path_to_urllist):
     with open(path_to_urllist, 'w') as fout:
         fout.writelines(data[1:])
 
-
 if __name__ == '__main__':
     #log_stat_collector(PATH_TO_FILTERED_LOG, PATH_TO_STAT_FILE)
     #js_dict = single_log_stat_analyzer(PATH_TO_FILTERED_LOG + 'kbb.com')

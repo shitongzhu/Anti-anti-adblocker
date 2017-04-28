@@ -44,6 +44,7 @@ PATTERN_LOG = r'\((\d*),(\d*)\) \S* <String\[\d*\]: (http\S*)>\s(IF|THEN|ELSE|Co
 NEW_PATTERN_LOG = r'(\S*) (IF|THEN|ELSE|ConditionalStatement|ConditionalStatementTrue|ConditionalStatementFalse) (x\d*y\d*o\d*)'
 PATTERN_DIFF_REC = r'Unmatched: pos (\S*) (\S*) abp-on \[(\d*), set\(\[.*\]\)\] abp-off \[(\d*), set\(\[.*\]\)\]'
 OFFSET_INFO = r'(\[COND\])?x(\d*)y(\d*)o(\d*)'
+OLD_SIGNATURE = r'x(\d*)y(\d*)o(\d*)'
 
 # position-wise flags
 THIS_POS_ONLY_HAS_IF = 0

@@ -7,6 +7,8 @@ import re
 import shutil
 from param import *
 from utils import *
+from HTMLCache import *
+import traceback
 
 
 def url_reader(path_to_urllist):
@@ -32,7 +34,7 @@ def url_loader(url, is_with_ext):
     return subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
 
 
-def log_extractor(path_to_log, flag_mode):
+def log_extractor(path_to_log, flag_mode, url):
     def load(path_to_file):
         f = open(path_to_file, 'r')
         lst = f.readlines()
@@ -44,18 +46,6 @@ def log_extractor(path_to_log, flag_mode):
         f.writelines(lst)
         f.close()
         return
-
-    def func_blacklist(line):
-        for kword in NO_KEYWORDS:
-            if kword in line:
-                return False
-        return True
-
-    def func_whitelist(line):
-        for kword in YES_KEYWORDS:
-            if kword in line:
-                return True
-        return False
 
     def func_transform(line):
         reg_match = re.match(log_pattern, line)
@@ -86,20 +76,9 @@ def log_extractor(path_to_log, flag_mode):
 
 
 def log_differ(path_to_dir, flag_mode):
-    def fetch_source(url):
-        try:
-            r = requests.get(url=url, headers=FAKE_HEADER)
-        except SSLError:
-            print '[ERROR][modify] SSL error found, no response fetched!'
-            return -1
-        if r.status_code != 200:
-            return -1
-        else:
-            return r.text
-
     files = []
     grand_dict = {}
-    html_cache = {}
+    cache = HTMLCache(path_to_dir)
     run_count = 0
     log_pattern = re.compile(NEW_PATTERN_LOG)
     blklist = set()
@@ -123,12 +102,15 @@ def log_differ(path_to_dir, flag_mode):
                 regex_match(lst[idx - 1]), regex_match(lst[idx]), regex_match(lst[idx + 1])
             if reg_group_curr is None or reg_group_next is None or reg_group_prev is None:
                 continue
-            trace_key_curr = reg_group_curr[0] + ' ' + reg_group_curr[2]
-            trace_key_next = reg_group_next[0] + ' ' + reg_group_next[2]
-            trace_key_prev = reg_group_prev[0] + ' ' + reg_group_prev[2]
-
-            if reg_group_curr[2].startswith('x0y0'):
-                convert_to_global
+            trace_key_curr = cache.generate_signature(
+                reg_group_curr[0], reg_group_curr[2], reg_group_curr[1]
+            )
+            trace_key_next = cache.generate_signature(
+                reg_group_next[0], reg_group_next[2], reg_group_curr[1]
+            )
+            trace_key_prev = cache.generate_signature(
+                reg_group_prev[0], reg_group_prev[2], reg_group_curr[1]
+            )
 
             if reg_group_curr[1] == 'IF':
                 if trace_key_curr != trace_key_next \
@@ -217,7 +199,7 @@ def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab):
     return flag_flipping is True
 
 
-if __name__ == '__main__':
+def main_loop():
     while url_reader(PATH_TO_URLFILE):
         try:
             url = url_reader(PATH_TO_URLFILE)
@@ -227,35 +209,35 @@ if __name__ == '__main__':
                 print "[INFO][looper] No existing directory"
             else:
                 print "[INFO][looper] Deleted duplicate directory"
-            # 1st pass, with adblock enabled
-            # tick its runtime
+
             for i in range(NUM_OF_RUNS):
+                # 1st pass, with adblock enabled
+                # tick its runtime
                 p0 = url_loader(None, is_with_ext=True)
                 time.sleep(TIMEOUT_WARMING)
                 p1 = url_loader(url, is_with_ext=True)
                 time.sleep(TIMEOUT_LOAD_W_AB)
                 p0.kill()
                 p1.kill()
-                site_dir1 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_W_AB)
+                site_dir1 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_W_AB, url=url)
 
                 # 2nd pass, with adblock disabled
                 p2 = url_loader(url, is_with_ext=False)
                 time.sleep(TIMEOUT_LOAD_WO_AB)
                 p2.kill()
-                site_dir2 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB)
+                site_dir2 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB, url=url)
             hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB)
             hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB)
             curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
-            res_flag = log_reporter(curr_site_dir, hashtable1, hashtable2)
-            js_dict = {}
+            log_reporter(curr_site_dir, hashtable1, hashtable2)
 
             js_dict = single_log_stat_analyzer(curr_site_dir)
             dispatch_urls(js_dict, curr_site_dir)
             sync_list_file(PATH_TO_URLFILE)
             print '[INFO][looper] This site is done\n'
         except Exception as e:
+            traceback.print_exc()
             error_msg = '[FATAL][looper] ' + str(e)
-            print(error_msg)
             error_log = open(PATH_TO_FILTERED_LOG + url + '/error_log', 'w')
             error_log.write(str(error_msg))
             error_log.close()
@@ -263,3 +245,6 @@ if __name__ == '__main__':
             continue
 
     print '[INFO][looper] A batch of experiments are done!'
+
+if __name__ == '__main__':
+    main_loop()
