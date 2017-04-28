@@ -192,7 +192,7 @@ def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab, mapping):
     f.close()
 
 
-if __name__ == '__main__':
+def main_loop():
     while url_reader(PATH_TO_URLFILE):
         try:
             url = url_reader(PATH_TO_URLFILE)
@@ -240,3 +240,7 @@ if __name__ == '__main__':
             continue
 
     print '[INFO][looper] A batch of experiments are done!'
+
+
+if __name__ == '__main__':
+    main_loop()
