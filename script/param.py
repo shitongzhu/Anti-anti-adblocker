@@ -11,9 +11,9 @@ ID = curr_path[-1]
 
 # paths
 PATH_TO_CHROMIUM     = '../../releases/Release' + ID + '/chrome'
-PATH_TO_URLFILE      = 'res/scanning_list'
+PATH_TO_URLFILE      = '../../res/urllist.txt'
 PATH_TO_LOG          = '/tmp/adblockJSLog' + ID + '.txt'
-PATH_TO_FILTERED_LOG = '../../logs/log_' + ID + '/'
+PATH_TO_FILTERED_LOG = '../../logs/log' + ID + '/'
 PATH_TO_STAT_FILE    = '../../logs/total_stat'
 PATH_TO_PROFILE      = '../../profiles/profile' + ID
 
@@ -78,6 +78,7 @@ DIFF_THRESHD_WO_AB = 0
 
 # URL for website list stored online
 URL_TO_ADB_LIST = 'https://raw.githubusercontent.com/shadowysean/anti-adblocker-list/master/anti-adb-evaluation-list.txt'
+URL_TO_ALEXA_1M = 'https://raw.githubusercontent.com/shadowysean/anti-adblocker-list/master/top-1m.txt'
 
 # fake header
 FAKE_HEADER = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2529.0 Safari/537.36'}
