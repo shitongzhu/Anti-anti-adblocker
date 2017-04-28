@@ -55,6 +55,7 @@ def dump_alexa_sites(top_n):
     f.close()
 '''
 
+
 def download_urllist(url_to_list):
     r = requests.get(url=url_to_list)
     curr_id = ID

@@ -40,10 +40,15 @@ FLAG_W_AB = 0
 FLAG_WO_AB = 1
 
 # regex pattern to match log record
-PATTERN_LOG = r'\((\d*),(\d*)\) \S* <String\[\d*\]: (http\S*)>\s(IF|THEN|ELSE|ConditionalStatement|ConditionalStatementTrue|ConditionalStatementFalse) (\d*)(\s-1|)'
-NEW_PATTERN_LOG = r'(\S*) (IF|THEN|ELSE|ConditionalStatement|ConditionalStatementTrue|ConditionalStatementFalse) (x\d*y\d*o\d*)'
-PATTERN_DIFF_REC = r'Unmatched: pos (\S*) (\S*) abp-on \[(\d*), set\(\[.*\]\)\] abp-off \[(\d*), set\(\[.*\]\)\]'
-OFFSET_INFO = r'(\[COND\])?x(\d*)y(\d*)o(\d*)'
+PATTERN_LOG       = r'\((\d*),(\d*)\) \S* <String\[\d*\]: ' \
+                    r'(http\S*)>\s(IF|THEN|ELSE|ConditionalStatement|ConditionalStatementTrue|ConditionalStatementFalse)' \
+                    r' (\d*)(\s-1|)'
+NEW_PATTERN_LOG   = r'(\S*) (IF|THEN|ELSE|ConditionalStatement|ConditionalStatementTrue|ConditionalStatementFalse) ' \
+                    r'(x\d*y\d*o\d*)'
+PATTERN_DIFF_REC  = r'Unmatched: pos (\S*) (\S*) abp-on \[(\d*), set\(\[.*\]\)\] abp-off \[(\d*), set\(\[.*\]\)\]'
+OFFSET_INFO       = r'(\[COND\])?x(\d*)y(\d*)o(\d*)'
+FULL_SIGNATURE    = r'(\S*) x(\d*)y(\d*)o(\d*)'
+COMPACT_SIGNATURE = r'(\S*) o(\d*)'
 
 # position-wise flags
 THIS_POS_ONLY_HAS_IF = 0

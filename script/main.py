@@ -7,6 +7,7 @@ import re
 import shutil
 from param import *
 from utils import *
+from SignatureMapping import SignatureMapping
 
 
 def url_reader(path_to_urllist):
@@ -45,18 +46,6 @@ def log_extractor(path_to_log, flag_mode):
         f.close()
         return
 
-    def func_blacklist(line):
-        for kword in NO_KEYWORDS:
-            if kword in line:
-                return False
-        return True
-
-    def func_whitelist(line):
-        for kword in YES_KEYWORDS:
-            if kword in line:
-                return True
-        return False
-
     def func_transform(line):
         reg_match = re.match(log_pattern, line)
         if reg_match:
@@ -85,21 +74,9 @@ def log_extractor(path_to_log, flag_mode):
     return output_dir
 
 
-def log_differ(path_to_dir, flag_mode):
-    def fetch_source(url):
-        try:
-            r = requests.get(url=url, headers=FAKE_HEADER)
-        except SSLError:
-            print '[ERROR][modify] SSL error found, no response fetched!'
-            return -1
-        if r.status_code != 200:
-            return -1
-        else:
-            return r.text
-
+def log_differ(path_to_dir, flag_mode, mapping):
     files = []
     grand_dict = {}
-    html_cache = {}
     run_count = 0
     log_pattern = re.compile(NEW_PATTERN_LOG)
     blklist = set()
@@ -123,12 +100,10 @@ def log_differ(path_to_dir, flag_mode):
                 regex_match(lst[idx - 1]), regex_match(lst[idx]), regex_match(lst[idx + 1])
             if reg_group_curr is None or reg_group_next is None or reg_group_prev is None:
                 continue
-            trace_key_curr = reg_group_curr[0] + ' ' + reg_group_curr[2]
-            trace_key_next = reg_group_next[0] + ' ' + reg_group_next[2]
-            trace_key_prev = reg_group_prev[0] + ' ' + reg_group_prev[2]
 
-            if reg_group_curr[2].startswith('x0y0'):
-                convert_to_global
+            trace_key_curr = mapping.map_to_compact(reg_group_curr[0] + ' ' + reg_group_curr[2])
+            trace_key_next = mapping.map_to_compact(reg_group_next[0] + ' ' + reg_group_next[2])
+            trace_key_prev = mapping.map_to_compact(reg_group_prev[0] + ' ' + reg_group_prev[2])
 
             if reg_group_curr[1] == 'IF':
                 if trace_key_curr != trace_key_next \
@@ -196,7 +171,7 @@ def log_differ(path_to_dir, flag_mode):
     return grand_dict_copy
 
 
-def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab):
+def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab, mapping):
     f = open(path_to_dir + 'diff_res', 'w')
     flag_flipping = False
     print "[INFO][looper] Starting log diff..."
@@ -206,7 +181,7 @@ def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab):
             continue
         if curr_val[0] != value[0]:
             flag_flipping = True
-            match_mark = "Unmatched: pos " + str(key) + " abp-on " + str(dict_w_ab.get(key, -1)) \
+            match_mark = "Unmatched: pos " + mapping.mapping_to_full(str(key)) + " abp-on " + str(dict_w_ab.get(key, -1)) \
                          + " abp-off " + str(dict_wo_ab.get(key, -1))
             f.write(match_mark + '\n')
             print '[INFO][looper] ' + match_mark
@@ -214,7 +189,6 @@ def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab):
         print "[INFO][looper] No unmatch detected!"
         f.write('No unmatch detected!\n')
     f.close()
-    return flag_flipping is True
 
 
 if __name__ == '__main__':
@@ -227,9 +201,10 @@ if __name__ == '__main__':
                 print "[INFO][looper] No existing directory"
             else:
                 print "[INFO][looper] Deleted duplicate directory"
-            # 1st pass, with adblock enabled
-            # tick its runtime
+
             for i in range(NUM_OF_RUNS):
+                # 1st pass, with adblock enabled
+                # tick its runtime
                 p0 = url_loader(None, is_with_ext=True)
                 time.sleep(TIMEOUT_WARMING)
                 p1 = url_loader(url, is_with_ext=True)
@@ -243,11 +218,11 @@ if __name__ == '__main__':
                 time.sleep(TIMEOUT_LOAD_WO_AB)
                 p2.kill()
                 site_dir2 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB)
-            hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB)
-            hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB)
+            cache = SignatureMapping()
+            hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
+            hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
             curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
-            res_flag = log_reporter(curr_site_dir, hashtable1, hashtable2)
-            js_dict = {}
+            log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
 
             js_dict = single_log_stat_analyzer(curr_site_dir)
             dispatch_urls(js_dict, curr_site_dir)
