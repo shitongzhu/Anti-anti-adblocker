@@ -32,7 +32,7 @@ YES_KEYWORDS = [
 ]
 
 # number of runs stuff
-NUM_OF_RUNS = 1
+NUM_OF_RUNS = 3
 N_TOP_ALEXA = 1000
 
 # flags

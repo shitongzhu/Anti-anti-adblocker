@@ -102,6 +102,7 @@ def log_differ(path_to_dir, flag_mode):
                 regex_match(lst[idx - 1]), regex_match(lst[idx]), regex_match(lst[idx + 1])
             if reg_group_curr is None or reg_group_next is None or reg_group_prev is None:
                 continue
+
             trace_key_curr = cache.generate_signature(
                 reg_group_curr[0], reg_group_curr[2], reg_group_curr[1]
             )

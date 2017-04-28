@@ -51,7 +51,11 @@ class HTMLCache(object):
         glob = 0
         x, y, local_oft = int(x), int(y), int(local_oft)
         for i in range(x):
-            glob += len(source.splitlines(True)[i])
+            try:
+                glob += len(source.splitlines(True)[i])
+            except IndexError:
+                print '[ERROR][cache] Weird out-of-range index occurs'
+                return 0
         start_of_stmt = glob + y + local_oft
         while source[start_of_stmt].strip() != source[start_of_stmt]:
             start_of_stmt += 1
@@ -75,7 +79,6 @@ class HTMLCache(object):
                     target_script_idx = i
             if target_script_idx == -1:
                 print "[ERROR][cache] No 'if' stmt accurately matched!"
-                print x, y, local_oft
                 return -1
             else:
                 return target_script_idx
@@ -98,7 +101,7 @@ class HTMLCache(object):
                 target_script_idx = i
         return target_script_idx
 
-    def get_index(self, source, url, x, y, local_oft, is_condstmt):
+    def get_index(self, source, url, x, y, local_oft, is_condstmt=False):
         intersig = url + ' ' + local_oft
         if self.has_signature(intersig):
             return self.cache_index[intersig]
