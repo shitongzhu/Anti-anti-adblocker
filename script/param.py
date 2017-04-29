@@ -2,12 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import os
+import socket
 
 # infer our browser id based on working directory
 curr_path = os.getcwd()
+curr_hostname = socket.gethostname()
 
 # browser id
 ID = curr_path[-1]
+LIST_ID = curr_hostname[-1]
 
 # paths
 PATH_TO_CHROMIUM     = '../../releases/Release' + ID + '/chrome'
@@ -78,7 +81,7 @@ DIFF_THRESHD_WO_AB = 0
 
 # URL for website list stored online
 URL_TO_ADB_LIST = 'https://raw.githubusercontent.com/shadowysean/anti-adblocker-list/master/anti-adb-evaluation-list.txt'
-URL_TO_ALEXA_1M = 'https://raw.githubusercontent.com/shadowysean/anti-adblocker-list/master/top-1m-0.txt'
+URL_TO_ALEXA_1M = 'https://raw.githubusercontent.com/shadowysean/anti-adblocker-list/master/top-1m-' + LIST_ID + '.txt'
 
 # fake header
 FAKE_HEADER = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2529.0 Safari/537.36'}
