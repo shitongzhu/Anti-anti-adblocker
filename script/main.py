@@ -196,7 +196,6 @@ def main_loop():
     while url_reader(PATH_TO_URLFILE):
         try:
             url = url_reader(PATH_TO_URLFILE)
-            sync_list_file(PATH_TO_URLFILE)
             try:
                 shutil.rmtree(PATH_TO_FILTERED_LOG + url)
             except OSError as err:
@@ -237,6 +236,7 @@ def main_loop():
             error_log = open(PATH_TO_FILTERED_LOG + url + '/error_log', 'w')
             error_log.write(str(error_msg))
             error_log.close()
+            sync_list_file(PATH_TO_URLFILE)
             continue
 
     print '[INFO][looper] A batch of experiments are done!'

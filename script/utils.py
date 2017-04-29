@@ -160,4 +160,4 @@ if __name__ == '__main__':
     #print js_dict
     #dispatch_urls(js_dict)
     #dump_alexa_sites(N_TOP_ALEXA)
-    download_urllist(URL_TO_ADB_LIST)
+    download_urllist(URL_TO_ALEXA_1M)
