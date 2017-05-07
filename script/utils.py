@@ -182,7 +182,7 @@ def merge_log_files(path_to_log_dir, path_to_aggr_log):
                 if int(diff_res_entry_group[2]) > 2 or int(diff_res_entry_group[3]) > 2:
                     continue
                 stmt_url, stmt_pos = diff_res_entry_group[0], diff_res_entry_group[1]
-                stmt_branch = 'true' if diff_res_entry_group[3] == 1 else 'false'
+                stmt_branch = 'true' if diff_res_entry_group[3] == '1' else 'false'
                 stmt_key = stmt_url + ' ' + stmt_pos
                 stmt_value = stmt_branch
                 site_dict[stmt_key] = stmt_value
@@ -209,11 +209,8 @@ def merge_log_files(path_to_log_dir, path_to_aggr_log):
                 stmt_key = stmt_url + ' ' + stmt_offset
                 stmt_branch = site_dict[stmt_key]
                 stmt_offset = re.match(offset_patt, stmt_offset).groups()[2]
-                stmt_expr = str.replace(stmt_expr, '"', '\"')
-                stmt_expr = str.replace(stmt_expr, "'", "\'")
-                stmt_expr = str.replace(stmt_expr, ",", "\,")
                 stmt_expr = stmt_expr[1:][:-1]
-                aggr_log.write('"' + fname + '","' + stmt_url + '",' + stmt_index + ',' + stmt_offset + ',' + stmt_branch + ',"' + stmt_expr + '"\n')
+                aggr_log.write('"' + fname + '","' + stmt_url + '",' + stmt_index + ',' + stmt_offset + ',' + stmt_branch + ',if,"' + stmt_expr + '"\n')
             curr_line += 1
 
 
@@ -223,5 +220,5 @@ if __name__ == '__main__':
     #print js_dict
     #dispatch_urls(js_dict)
     #dump_alexa_sites(N_TOP_ALEXA)
-    #download_urllist(URL_TO_ALEXA_1M)
-    merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)
+    download_urllist(URL_TO_ALEXA_1M)
+    #merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)

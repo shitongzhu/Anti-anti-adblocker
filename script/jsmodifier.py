@@ -10,6 +10,10 @@ import os
 import copy
 from ssl import SSLError
 import re
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 
 def dispatch_urls(scripts_dict, curr_site_dir):
@@ -60,6 +64,9 @@ def dispatch_urls(scripts_dict, curr_site_dir):
                         replace_res.write("ERROR: no 'if' condition at offset " + js_pos + ' found!\n')
                     else:
                         source = add_temp_var(source, begin, expr)
+                        expr = expr.replace(u'\u0022', u'\u005C\u0022')
+                        expr = expr.replace(u"\u000A", u"\u005C\u000A")
+                        expr = expr.replace(u"\u002C", u"\u005C\u002C")
                         replace_res.write('expr: ' + expr + ' | index: ' + str(idx) + ' | offset: ' + js_pos + '\n')
             replace_res.write('\n')
 
@@ -103,18 +110,6 @@ def modify_expr(source, stmt_offset, is_condstmt=False):
             start_of_stmt += 1
         return start_of_stmt
 
-    # now that we already have the in-page index, this helper function is deprecated
-    def is_html(source):
-        tree = html.fromstring(source)
-        if tree.tag == 'html':
-            print '[INFO][modify] This is a HTML'
-            return True
-        elif tree.tag == 'p' or 'div':
-            print '[INFO][modify] This is not a HTML'
-            return False
-        else:
-            print '[ERROR][modify] Source type check failed: this document is of type ' + tree.tag
-
     stack = []
     target_script_idx = -1
     offset_pattern = re.compile(OFFSET_INFO)
@@ -131,8 +126,9 @@ def modify_expr(source, stmt_offset, is_condstmt=False):
             scripts = soup.find_all('script')
             target_script_idx = len(scripts) - 1
             for i in range(len(scripts) - 1):
-                if source.find(scripts[i].text) < idx < source.find(scripts[i + 1].text):
+                if source.find(scripts[i].text) <= idx <= source.find(scripts[i].text) + len(scripts[i].text):
                     target_script_idx = i
+                    break
             return source, None, None, target_script_idx
         else:
             return source, None, None, -1
@@ -158,8 +154,9 @@ def modify_expr(source, stmt_offset, is_condstmt=False):
             scripts = soup.find_all('script')
             target_script_idx = len(scripts) - 1
             for i in range(len(scripts) - 1):
-                if source.find(scripts[i].text) < idx < source.find(scripts[i + 1].text):
+                if source.find(scripts[i].text) <= idx <= source.find(scripts[i].text) + len(scripts[i].text):
                     target_script_idx = i
+                    break
         while source[idx] != '(' and idx + 1 <= len(source):
             idx += 1
         begin = idx

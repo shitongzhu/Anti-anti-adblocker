@@ -232,7 +232,7 @@ def main_loop():
         except Exception as e:
             error_msg = '[FATAL][looper] ' + str(e)
             traceback.print_exc()
-            print(error_msg)
+            print(error_msg + '\n')
             error_log = open(PATH_TO_FILTERED_LOG + url + '/error_log', 'w')
             error_log.write(str(error_msg))
             error_log.close()
