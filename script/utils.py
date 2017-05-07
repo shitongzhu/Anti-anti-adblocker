@@ -157,10 +157,71 @@ def sync_list_file(path_to_urllist):
         fout.writelines(data[1:])
 
 
+def merge_log_files(path_to_log_dir, path_to_aggr_log):
+    aggr_log = open(path_to_aggr_log, 'w+')
+    diff_res_entry = re.compile(PATTERN_DIFF_REC)
+    replace_res_head = re.compile(REPLACE_TITLE)
+    replace_res_entry = re.compile(REPLACE_ENTRY)
+    offset_patt = re.compile(RAW_OFFSET_INFO)
+
+    for fname in os.listdir(path_to_log_dir):
+        site_dict = dict()
+        try:
+            diff_file = open(path_to_log_dir + fname + '/diff_res', 'r')
+        except IOError:
+            print '[ERROR][util] ' + fname + " is not yet finished"
+            continue
+        diff_content = diff_file.readlines()
+        if diff_content[0] == 'No unmatch detected!\n':
+            continue
+        else:
+            for l in diff_content:
+                diff_res_entry_match = re.match(diff_res_entry, l)
+                diff_res_entry_group = diff_res_entry_match.groups()
+                # Ignore conditional statements for now
+                if int(diff_res_entry_group[2]) > 2 or int(diff_res_entry_group[3]) > 2:
+                    continue
+                stmt_url, stmt_pos = diff_res_entry_group[0], diff_res_entry_group[1]
+                stmt_branch = 'true' if diff_res_entry_group[3] == 1 else 'false'
+                stmt_key = stmt_url + ' ' + stmt_pos
+                stmt_value = stmt_branch
+                site_dict[stmt_key] = stmt_value
+
+        replace_file = open(path_to_log_dir + fname + '/replace_res', 'r')
+        replace_content = replace_file.readlines()
+        curr_line = 0
+        while curr_line < len(replace_content) - 1:
+            replace_res_head_match = re.match(replace_res_head, replace_content[curr_line])
+            if not replace_res_head_match:
+                curr_line += 1
+                continue
+            replace_res_head_group = replace_res_head_match.groups()
+            stmt_url = replace_res_head_group[0]
+            stmt_count = int(replace_res_head_group[2])
+            for i in range(stmt_count):
+                curr_line += 1
+                replace_res_entry_match = re.match(replace_res_entry, replace_content[curr_line])
+                if not replace_res_entry_match:
+                    continue
+                replace_res_entry_group = replace_res_entry_match.groups()
+                stmt_expr, stmt_index, stmt_offset = \
+                    replace_res_entry_group[0], replace_res_entry_group[1], replace_res_entry_group[2]
+                stmt_key = stmt_url + ' ' + stmt_offset
+                stmt_branch = site_dict[stmt_key]
+                stmt_offset = re.match(offset_patt, stmt_offset).groups()[2]
+                stmt_expr = str.replace(stmt_expr, '"', '\"')
+                stmt_expr = str.replace(stmt_expr, "'", "\'")
+                stmt_expr = str.replace(stmt_expr, ",", "\,")
+                stmt_expr = stmt_expr[1:][:-1]
+                aggr_log.write('"' + fname + '","' + stmt_url + '",' + stmt_index + ',' + stmt_offset + ',' + stmt_branch + ',"' + stmt_expr + '"\n')
+            curr_line += 1
+
+
 if __name__ == '__main__':
     #log_stat_collector(PATH_TO_FILTERED_LOG, PATH_TO_STAT_FILE)
     #js_dict = single_log_stat_analyzer(PATH_TO_FILTERED_LOG + 'kbb.com')
     #print js_dict
     #dispatch_urls(js_dict)
     #dump_alexa_sites(N_TOP_ALEXA)
-    download_urllist(URL_TO_ALEXA_1M)
+    #download_urllist(URL_TO_ALEXA_1M)
+    merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)

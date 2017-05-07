@@ -19,6 +19,7 @@ PATH_TO_LOG          = '/tmp/adblockJSLog' + ID + '.txt'
 PATH_TO_FILTERED_LOG = '../../logs/log' + ID + '/'
 PATH_TO_STAT_FILE    = '../../logs/total_stat'
 PATH_TO_PROFILE      = '../../profiles/profile' + ID + '/'
+PATH_TO_MERGED_LOG   = '../../logs/merged_log'
 
 # signals
 SIGSUCCESS = 1
@@ -50,8 +51,11 @@ NEW_PATTERN_LOG   = r'(\S*) (IF|THEN|ELSE|ConditionalStatement|ConditionalStatem
                     r'(x\d*y\d*o\d*)'
 PATTERN_DIFF_REC  = r'Unmatched: pos (\S*) (\S*) abp-on \[(\d*), set\(\[.*\]\)\] abp-off \[(\d*), set\(\[.*\]\)\]'
 OFFSET_INFO       = r'(\[COND\])?x(\d*)y(\d*)o(\d*)'
+RAW_OFFSET_INFO   = r'x(\d*)y(\d*)o(\d*)'
 FULL_SIGNATURE    = r'(\S*) x(\d*)y(\d*)o(\d*)'
 COMPACT_SIGNATURE = r'(\S*) o(\d*)'
+REPLACE_TITLE     = r'(\S*) -> (\S*) \| (\d*) replacement\(s\)'
+REPLACE_ENTRY     = r'expr: (.*) \| index: (\S*) \| offset: (\S*)'
 
 # position-wise flags
 THIS_POS_ONLY_HAS_IF = 0
