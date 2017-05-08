@@ -65,8 +65,8 @@ def dispatch_urls(scripts_dict, curr_site_dir):
                     else:
                         source = add_temp_var(source, begin, expr)
                         expr = expr.replace(u'\u0022', u'\u005C\u0022')
-                        expr = expr.replace(u"\u000A", u"\u005C\u005C\u000A")
-                        expr = expr.replace(u"\u002C", u"\u005C\u006E")
+                        expr = expr.replace(u"\u000A", u"\u005C\u005C\u006E")
+                        expr = expr.replace(u"\u002C", u"\u005C\u002C")
                         replace_res.write('expr: ' + expr + ' | index: ' + str(idx) + ' | offset: ' + js_pos + '\n')
             replace_res.write('\n')
 
