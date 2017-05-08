@@ -221,5 +221,5 @@ if __name__ == '__main__':
     #print js_dict
     #dispatch_urls(js_dict)
     #dump_alexa_sites(N_TOP_ALEXA)
-    #download_urllist(URL_TO_ALEXA_1M)
-    merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)
+    download_urllist(URL_TO_ALEXA_1M)
+    #merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)
