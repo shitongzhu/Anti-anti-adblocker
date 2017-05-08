@@ -210,7 +210,8 @@ def merge_log_files(path_to_log_dir, path_to_aggr_log):
                 stmt_branch = site_dict[stmt_key]
                 stmt_offset = re.match(offset_patt, stmt_offset).groups()[2]
                 stmt_expr = stmt_expr[1:][:-1]
-                aggr_log.write('"' + fname + '","' + stmt_url + '",' + stmt_index + ',' + stmt_offset + ',' + stmt_branch + ',if,"' + stmt_expr + '"\n')
+                aggr_log.write('"' + fname + '","' + stmt_url + '",' + stmt_index + ',' + stmt_offset + ',' + \
+                               stmt_branch + ',if,"' + stmt_expr + '"\n')
             curr_line += 1
 
 
