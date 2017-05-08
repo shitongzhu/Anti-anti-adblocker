@@ -19,7 +19,7 @@ PATH_TO_LOG          = '/tmp/adblockJSLog' + ID + '.txt'
 PATH_TO_FILTERED_LOG = '../../logs/log' + ID + '/'
 PATH_TO_STAT_FILE    = '../../logs/total_stat'
 PATH_TO_PROFILE      = '../../profiles/profile' + ID + '/'
-PATH_TO_MERGED_LOG   = '../../logs/merged_log'
+PATH_TO_MERGED_LOG   = '../../logs/filterList' + ID + '.csv'
 
 # signals
 SIGSUCCESS = 1
