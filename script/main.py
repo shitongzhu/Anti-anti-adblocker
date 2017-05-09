@@ -47,19 +47,43 @@ def log_extractor(path_to_log, flag_mode, url):
         f.close()
         return
 
+    def call_stack_builder(line):
+        if len(line) == 1:
+            return
+        eles = line.split(" ")
+        if eles[2] == "CALL":
+            call_stack.append(eles[3] + "_" + eles[4] + "_" + eles[5].strip())
+            return True
+        elif eles[2] == "RET":
+            if call_stack[-1] == eles[3] + "_" + eles[4] + "_" + eles[5].strip():
+                call_stack.pop()
+                return True
+        return False
+
+    def get_top_2_caller():
+        if call_stack.count() > 2:
+            return call_stack[-2] + "_" + call_stack[-1]
+        elif call_stack.count() == 1:
+            return call_stack[0]
+        else:
+            return ""
+
     def func_transform(line):
+        if call_stack_builder(line):
+            return None
         reg_match = re.match(log_pattern, line)
         if reg_match:
             reg_group = reg_match.groups()
             script_url, stmt_type, position = \
                 reg_group[2], reg_group[3], 'x' + reg_group[0] + 'y' + reg_group[1] + 'o' + reg_group[4]
-            return script_url + ' ' + stmt_type + ' ' + position + '\n'
+            return get_top_2_caller()+ '_' + script_url + ' ' + stmt_type + ' ' + position + '\n'
         else:
             return None
 
     def filter_by_kword(lst):
         return [func_transform(line) for line in lst if func_transform(line)]
 
+    call_stack = []
     log = load(path_to_log)
     log_pattern = re.compile(PATTERN_LOG)
     filtered_log = filter_by_kword(log)
@@ -123,7 +147,7 @@ def log_differ(path_to_dir, flag_mode, mapping):
             elif reg_group_curr[1] == 'THEN':
                 if grand_dict.get(trace_key_curr, -1) == -1:
                     grand_dict[trace_key_curr] = [THIS_POS_HAS_IF_THEN, {run_count}]
-                elif grand_dict[trace_key_curr][0] == THIS_POS_ONLY_HAS_IF and trace_key_curr != trace_key_prev\
+                elif grand_dict[trace_key_curr][0] == THIS_POS_ONLY_HAS_IF and trace_key_curr != trace_key_prev \
                         and run_count in grand_dict[trace_key_curr][1]:
                     grand_dict[trace_key_curr][0] = THIS_POS_HAS_IF_THEN
                     blklist.discard(trace_key_curr)
@@ -135,7 +159,7 @@ def log_differ(path_to_dir, flag_mode, mapping):
             elif reg_group_curr[1] == 'ELSE':
                 if grand_dict.get(trace_key_curr, -1) == -1:
                     grand_dict[trace_key_curr] = [THIS_POS_HAS_IF_ELSE, {run_count}]
-                elif grand_dict[trace_key_curr][0] == THIS_POS_ONLY_HAS_IF and trace_key_curr != trace_key_prev\
+                elif grand_dict[trace_key_curr][0] == THIS_POS_ONLY_HAS_IF and trace_key_curr != trace_key_prev \
                         and run_count in grand_dict[trace_key_curr][1]:
                     grand_dict[trace_key_curr][0] = THIS_POS_HAS_IF_ELSE
                     blklist.discard(trace_key_curr)
@@ -242,5 +266,37 @@ def main_loop():
     print '[INFO][looper] A batch of experiments are done!'
 
 
+def call_stack_test():
+    def load(path_to_file):
+        f = open(path_to_file, 'r')
+        lst = f.readlines()
+        f.close()
+        return lst
+
+    def unload(path_to_file, lst):
+        f = open(path_to_file, 'w')
+        f.writelines(lst)
+        f.close()
+        return
+
+    def call_stack_builder(line):
+        if len(line) == 1:
+            return
+        eles = line.split(" ")
+        if eles[2] == "CALL":
+            call_stack.append(eles[3] + "_" + eles[4] + "_" + eles[5].strip())
+        elif eles[2] == "RET":
+            if call_stack[-1] == eles[3] + "_" + eles[4] + "_" + eles[5].strip():
+                call_stack.pop()
+                print call_stack
+
+    call_stack = []
+    log = load("/home/hu/work/adblockJSLog.txt")
+    for line in log:
+        call_stack_builder(line)
+    print call_stack
+
+
 if __name__ == '__main__':
     main_loop()
+    #call_stack_test()
