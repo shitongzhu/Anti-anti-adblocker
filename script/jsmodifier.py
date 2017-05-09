@@ -157,6 +157,9 @@ def modify_expr(source, stmt_offset, is_condstmt=False):
                 if source.find(scripts[i].text) <= idx <= source.find(scripts[i].text) + len(scripts[i].text):
                     target_script_idx = i
                     break
+
+        while source[idx:idx + 2] != 'if':
+            idx += 1
         while source[idx] != '(' and idx + 1 <= len(source):
             idx += 1
         begin = idx
