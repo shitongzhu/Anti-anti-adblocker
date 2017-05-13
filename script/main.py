@@ -51,19 +51,34 @@ def log_extractor(path_to_log, flag_mode, url):
         if len(line) == 1:
             return
         eles = line.split(" ")
-        if eles[2] == "CALL":
-            call_stack.append(eles[3] + "_" + eles[4] + "_" + eles[5].strip())
+        if len(eles) < 5:
+            print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+            return
+        elif eles[4] == "CALL":
+            call_stack.append(eles[7][:-1] + "_" + eles[8] + "_" + eles[9].strip())
             return True
-        elif eles[2] == "RET":
-            if call_stack[-1] == eles[3] + "_" + eles[4] + "_" + eles[5].strip():
+        elif eles[4] == "RET":
+            if not call_stack:
+                print '[ERROR][context] Empty call stack, curr line: ' + line[:-1]
+                return True
+            if len(eles) < 10:
+                print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+                return True
+            elif call_stack[-1] == eles[7][:-1] + "_" + eles[8] + "_" + eles[9].strip():
                 call_stack.pop()
                 return True
         return False
 
     def get_top_2_caller():
-        if call_stack.count() > 2:
+        if len(call_stack) > 2:
             return call_stack[-2] + "_" + call_stack[-1]
-        elif call_stack.count() == 1:
+        elif len(call_stack) == 1:
+            return call_stack[0]
+        else:
+            return ""
+
+    def get_top_1_caller():
+        if len(call_stack) == 1:
             return call_stack[0]
         else:
             return ""
@@ -76,7 +91,7 @@ def log_extractor(path_to_log, flag_mode, url):
             reg_group = reg_match.groups()
             script_url, stmt_type, position = \
                 reg_group[2], reg_group[3], 'x' + reg_group[0] + 'y' + reg_group[1] + 'o' + reg_group[4]
-            return get_top_2_caller()+ '_' + script_url + ' ' + stmt_type + ' ' + position + '\n'
+            return get_top_2_caller() + '_' + script_url + ' ' + stmt_type + ' ' + position + '\n'
         else:
             return None
 
