@@ -56,6 +56,7 @@ FULL_SIGNATURE    = r'(\S*) x(\d*)y(\d*)o(\d*)'
 COMPACT_SIGNATURE = r'(\S*) o(\d*)'
 REPLACE_TITLE     = r'(\S*) -> (\S*) \| (\d*) replacement\(s\)'
 REPLACE_ENTRY     = r'expr: (.*) \| index: (\S*) \| offset: (\S*)'
+CONTEXTUAL_URL    = r'(\S*)_(http\S*)'
 
 # position-wise flags
 THIS_POS_ONLY_HAS_IF = 0

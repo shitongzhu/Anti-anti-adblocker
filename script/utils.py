@@ -163,6 +163,7 @@ def merge_log_files(path_to_log_dir, path_to_aggr_log):
     replace_res_head = re.compile(REPLACE_TITLE)
     replace_res_entry = re.compile(REPLACE_ENTRY)
     offset_patt = re.compile(RAW_OFFSET_INFO)
+    contextual_url = re.compile(CONTEXTUAL_URL)
 
     for fname in os.listdir(path_to_log_dir):
         site_dict = dict()
@@ -181,7 +182,11 @@ def merge_log_files(path_to_log_dir, path_to_aggr_log):
                 # Ignore conditional statements for now
                 if int(diff_res_entry_group[2]) > 2 or int(diff_res_entry_group[3]) > 2:
                     continue
-                stmt_url, stmt_pos = diff_res_entry_group[0], diff_res_entry_group[1]
+                stmt_contextual_url, stmt_pos = diff_res_entry_group[0], diff_res_entry_group[1]
+
+                contextual_url_group = re.match(contextual_url, stmt_contextual_url).groups()
+                stmt_url = contextual_url_group[1]
+
                 stmt_branch = 'true' if diff_res_entry_group[3] == '1' else 'false'
                 stmt_key = stmt_url + ' ' + stmt_pos
                 stmt_value = stmt_branch

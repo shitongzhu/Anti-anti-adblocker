@@ -33,14 +33,18 @@ def dispatch_urls(scripts_dict, curr_site_dir):
         return reg_group
 
     offset_pattern = re.compile(OFFSET_INFO)
+    url_context = re.compile(CONTEXTUAL_URL)
     curr_site_js_dir = curr_site_dir + 'modified_js/'
     replace_res = open(curr_site_dir + 'replace_res', 'w+')
     if scripts_dict:
         for key, val in scripts_dict.iteritems():
-            js_url = key
+            context_group = re.match(url_context, key).groups()
+            context = context_group[0]
+            js_url = context_group[1]
             print '[INFO][modify] Now modifying script/html ' + js_url + '...'
             modified_fname = 'modified_file_' + str(int(time.time() * 100))
-            replace_res.write(js_url + ' -> ' + modified_fname + ' | ' + str(len(val)) + ' replacement(s)\n')
+            replace_res.write(js_url + ' -> ' + modified_fname + ' | ' + str(len(val)) + ' replacement(s) | ' +
+                              'call stack: ' + context + '\n')
             source = fetch_source(js_url)
             source_copy = copy.copy(source)
             if source == -1:
@@ -85,7 +89,7 @@ def dispatch_urls(scripts_dict, curr_site_dir):
 def fetch_source(url):
     try:
         r = requests.get(url=url, headers=FAKE_HEADER)
-    except Exception:
+    except SSLError:
         print '[ERROR][modify] SSL error found, no response fetched!'
         return -1
     if r.status_code != 200:
