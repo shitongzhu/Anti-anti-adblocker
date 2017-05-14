@@ -68,13 +68,14 @@ def dispatch_urls(scripts_dict, curr_site_dir):
                     if idx is None:
                         replace_res.write("ERROR: no 'if' condition at offset " + js_pos + ' found!\n')
                     else:
-                        source = add_temp_var(source, begin, expr)
+                        #source = add_temp_var(source, begin, expr)
                         expr = expr.replace(u'\u0022', u'\u005C\u0022')
                         expr = expr.replace(u"\u000A", u"\u005C\u005C\u006E")
                         expr = expr.replace(u"\u002C", u"\u005C\u002C")
                         replace_res.write('type: i |' + ' expr: ' + expr + ' | index: ' + str(idx) + ' | offset: ' + js_pos + '\n')
             replace_res.write('\n')
 
+            '''
             if not os.path.exists(curr_site_js_dir):
                 print '[INFO][modify] Now creating the folder ' + curr_site_js_dir + '...'
                 os.mkdir(curr_site_js_dir)
@@ -82,6 +83,7 @@ def dispatch_urls(scripts_dict, curr_site_dir):
                 js_file = open(curr_site_js_dir + modified_fname, 'w+')
                 js_file.write(source.encode('utf8'))
                 js_file.close()
+            '''
     else:
         print '[INFO][modify] No script to replace!'
     replace_res.close()
@@ -207,7 +209,7 @@ def modify_expr(source, stmt_offset, is_condstmt=False):
             print '[ERROR][modify] Invalid parenthesis!'
             return -1
         expr = source[begin:end]
-        source = source[:begin] + '(false)' + source[end:]
+        #source = source[:begin] + '(false)' + source[end:]
         print '[INFO][modify] ' + expr + ' -> extracted if condition'
         return source, begin, expr, target_script_idx
 
