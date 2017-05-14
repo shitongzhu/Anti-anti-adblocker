@@ -82,6 +82,7 @@ KILL_TIMES = 5
 # threshold parameters
 DIFF_THRESHD_W_AB = 0
 DIFF_THRESHD_WO_AB = 0
+LF_THRESHD = 200
 
 # URL for website list stored online
 URL_TO_ADB_LIST = 'https://raw.githubusercontent.com/shadowysean/anti-adblocker-list/master/anti-adb-evaluation-list.txt'
