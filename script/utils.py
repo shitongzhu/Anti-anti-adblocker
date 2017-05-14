@@ -3,6 +3,7 @@
 
 import os
 import re
+import shutil
 import operator
 from time import gmtime, strftime
 from param import *
@@ -215,6 +216,30 @@ def merge_log_files(path_to_log_dir, path_to_aggr_log):
             curr_line += 1
 
 
+def delete_raw_log(path_to_log_dir):
+    for fname in os.listdir(path_to_log_dir):
+        try:
+            diff_file = open(path_to_log_dir + fname + '/diff_res', 'r')
+        except IOError:
+            print '[ERROR][util] ' + fname + " is not yet finished"
+            continue
+        diff_content = diff_file.readlines()
+        if not diff_content:
+            print '[INFO][util] ' + fname + " has an empty diff_res"
+            continue
+        if diff_content[0] != 'No unmatch detected!\n':
+            print '[INFO][util] ' + fname + " contains flipping(s), therefore not to be deleted"
+            continue
+        else:
+            try:
+                curr_site_dir = path_to_log_dir + fname + '/'
+                shutil.rmtree(curr_site_dir + 'w_adblocker/')
+                shutil.rmtree(curr_site_dir + 'wo_adblocker/')
+            except OSError as e:
+                print "[INFO][util] No existing raw log folders"
+            else:
+                print "[INFO][looper] Deleted raw log files"
+
 if __name__ == '__main__':
     #log_stat_collector(PATH_TO_FILTERED_LOG, PATH_TO_STAT_FILE)
     #js_dict = single_log_stat_analyzer(PATH_TO_FILTERED_LOG + 'kbb.com')
@@ -222,4 +247,5 @@ if __name__ == '__main__':
     #dispatch_urls(js_dict)
     #dump_alexa_sites(N_TOP_ALEXA)
     #download_urllist(URL_TO_ALEXA_1M)
-    merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)
+    #merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)
+    delete_raw_log(PATH_TO_FILTERED_LOG)
