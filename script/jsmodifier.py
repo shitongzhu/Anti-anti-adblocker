@@ -110,7 +110,9 @@ def modify_expr(source, stmt_offset, is_condstmt=False):
         for i in range(x):
             glob += len(source.splitlines(True)[i])
         start_of_stmt = glob + y + local_oft
-        while source[start_of_stmt:start_of_stmt + 2] != 'if':
+        lf_count = 0
+        while source[start_of_stmt:start_of_stmt + 2] != 'if' and lf_count <= LF_THRESHD:
+            lf_count += 1
             start_of_stmt += 1
         return start_of_stmt
 
