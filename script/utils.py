@@ -179,15 +179,12 @@ def merge_log_files(path_to_log_dir, path_to_aggr_log):
             for l in diff_content:
                 diff_res_entry_match = re.match(diff_res_entry, l)
                 diff_res_entry_group = diff_res_entry_match.groups()
-                # Ignore conditional statements for now
-                if int(diff_res_entry_group[2]) > 2 or int(diff_res_entry_group[3]) > 2:
-                    continue
                 stmt_contextual_url, stmt_pos = diff_res_entry_group[0], diff_res_entry_group[1]
 
                 contextual_url_group = re.match(contextual_url, stmt_contextual_url).groups()
                 stmt_url = contextual_url_group[1]
 
-                stmt_branch = 'true' if diff_res_entry_group[3] == '1' else 'false'
+                stmt_branch = 'true' if diff_res_entry_group[3] in {'1', '3'} else 'false'
                 stmt_key = stmt_url + ' ' + stmt_pos
                 stmt_value = stmt_branch
                 site_dict[stmt_key] = stmt_value
@@ -209,14 +206,15 @@ def merge_log_files(path_to_log_dir, path_to_aggr_log):
                 if not replace_res_entry_match:
                     continue
                 replace_res_entry_group = replace_res_entry_match.groups()
-                stmt_expr, stmt_index, stmt_offset = \
-                    replace_res_entry_group[0], replace_res_entry_group[1], replace_res_entry_group[2]
+                stmt_type, stmt_expr, stmt_index, stmt_offset = \
+                    replace_res_entry_group[0], replace_res_entry_group[1], replace_res_entry_group[2], replace_res_entry_group[3]
                 stmt_key = stmt_url + ' ' + stmt_offset
                 stmt_branch = site_dict[stmt_key]
                 stmt_offset = re.match(offset_patt, stmt_offset).groups()[2]
-                stmt_expr = stmt_expr[1:][:-1]
+                if stmt_type == 'i':
+                    stmt_expr = stmt_expr[1:][:-1]
                 aggr_log.write('"' + fname + '","' + stmt_url + '",' + stmt_index + ',' + stmt_offset + ',' + \
-                               stmt_branch + ',"' + stmt_expr + '"\n')
+                               stmt_type + ',' + stmt_branch + ',"' + stmt_expr + '"\n')
             curr_line += 1
 
 

@@ -55,7 +55,7 @@ RAW_OFFSET_INFO   = r'x(\d*)y(\d*)o(\d*)'
 FULL_SIGNATURE    = r'(\S*) x(\d*)y(\d*)o(\d*)'
 COMPACT_SIGNATURE = r'(\S*) o(\d*)'
 REPLACE_TITLE     = r'(\S*) -> (\S*) \| (\d*) replacement\(s\)'
-REPLACE_ENTRY     = r'expr: (.*) \| index: (\S*) \| offset: (\S*)'
+REPLACE_ENTRY     = r'type: (\S) \| expr: (.*) \| index: (\S*) \| offset: (\S*)'
 CONTEXTUAL_URL    = r'(\S*)_(http\S*)'
 
 # position-wise flags

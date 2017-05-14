@@ -61,7 +61,7 @@ def dispatch_urls(scripts_dict, curr_site_dir):
                 # separate handling with conditional statements
                 if regexp_offset(js_pos)[0] == '[COND]':
                     source, begin, expr, idx = modify_expr(source, js_pos, is_condstmt=True)
-                    replace_res.write('[CondStmt]' + ' index: ' + str(idx) + ' | offset: ' + js_pos_cleaned + '\n')
+                    replace_res.write('type: t |' + ' expr: ' + expr + ' | index: ' + str(idx) + ' | offset: ' + js_pos_cleaned + '\n')
                 else:
                     source, begin, expr, idx = modify_expr(source, js_pos, is_condstmt=False)
                     if idx is None:
@@ -71,7 +71,7 @@ def dispatch_urls(scripts_dict, curr_site_dir):
                         expr = expr.replace(u'\u0022', u'\u005C\u0022')
                         expr = expr.replace(u"\u000A", u"\u005C\u005C\u006E")
                         expr = expr.replace(u"\u002C", u"\u005C\u002C")
-                        replace_res.write('expr: ' + expr + ' | index: ' + str(idx) + ' | offset: ' + js_pos + '\n')
+                        replace_res.write('type: i |' + ' expr: ' + expr + ' | index: ' + str(idx) + ' | offset: ' + js_pos + '\n')
             replace_res.write('\n')
 
             if not os.path.exists(curr_site_js_dir):
@@ -104,13 +104,23 @@ def modify_expr(source, stmt_offset, is_condstmt=False):
         reg_group = reg_match.groups()
         return reg_group
 
-    def convert_to_global(source, x, y, local_oft):
+    def convert_to_global_if(source, x, y, local_oft):
         glob = 0
         x, y, local_oft = int(x), int(y), int(local_oft)
         for i in range(x):
             glob += len(source.splitlines(True)[i])
         start_of_stmt = glob + y + local_oft
         while source[start_of_stmt:start_of_stmt + 2] != 'if':
+            start_of_stmt += 1
+        return start_of_stmt
+
+    def convert_to_global_cond(source, x, y, local_oft):
+        glob = 0
+        x, y, local_oft = int(x), int(y), int(local_oft)
+        for i in range(x):
+            glob += len(source.splitlines(True)[i])
+        start_of_stmt = glob + y + local_oft
+        while source[start_of_stmt:start_of_stmt + 1].isspace():
             start_of_stmt += 1
         return start_of_stmt
 
@@ -125,7 +135,7 @@ def modify_expr(source, stmt_offset, is_condstmt=False):
     # separate handling with conditional statement traces
     if is_condstmt:
         if x != 0 or y != 0:
-            idx = convert_to_global(source, x, y, stmt_offset)
+            idx = convert_to_global_cond(source, x, y, stmt_offset)
             soup = BeautifulSoup(source, "lxml")
             scripts = soup.find_all('script')
             target_script_idx = len(scripts) - 1
@@ -133,12 +143,22 @@ def modify_expr(source, stmt_offset, is_condstmt=False):
                 if source.find(scripts[i].text) <= idx <= source.find(scripts[i].text) + len(scripts[i].text):
                     target_script_idx = i
                     break
-            return source, None, None, target_script_idx
+            begin = idx
+            while source[idx] != '?':
+                idx += 1
+            condition = source[begin:idx]
+            print '[INFO][modify] ' + condition + ' -> extracted ternary condition'
+            return source, begin, condition, target_script_idx
         else:
-            return source, None, None, -1
+            begin = idx
+            while source[idx] != '?':
+                idx += 1
+            condition = source[begin:idx]
+            print '[INFO][modify] ' + condition + ' -> extracted ternary condition'
+            return source, begin, condition, -1
     else:
         if x != 0 or y != 0:
-            idx = convert_to_global(source, x, y, stmt_offset)
+            idx = convert_to_global_if(source, x, y, stmt_offset)
             if source[idx:idx + 2] != 'if':
                 print "[ERROR][modify] Direct 'if' match failed, now secondary..."
                 soup = BeautifulSoup(source, "lxml")
@@ -183,7 +203,7 @@ def modify_expr(source, stmt_offset, is_condstmt=False):
             return -1
         expr = source[begin:end]
         source = source[:begin] + '(false)' + source[end:]
-        print '[INFO][modify] ' + expr + ' is the identified and extracted conditional expression'
+        print '[INFO][modify] ' + expr + ' -> extracted if condition'
         return source, begin, expr, target_script_idx
 
 
