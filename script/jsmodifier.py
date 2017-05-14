@@ -23,8 +23,6 @@ def dispatch_urls(scripts_dict, curr_site_dir):
         for i in range(x):
             glob += len(source.splitlines(True)[i])
         start_of_stmt = glob + y + local_oft
-        while source[start_of_stmt].strip() != source[start_of_stmt]:
-            start_of_stmt += 1
         return start_of_stmt
 
     def regexp_offset(line):
@@ -184,7 +182,9 @@ def modify_expr(source, stmt_offset, is_condstmt=False):
                     target_script_idx = i
                     break
 
-        while source[idx:idx + 2] != 'if':
+        lf_count = 0
+        while source[idx:idx + 2] != 'if' and lf_count < LF_THRESHD:
+            lf_count += 1
             idx += 1
         while source[idx] != '(' and idx + 1 <= len(source):
             idx += 1
