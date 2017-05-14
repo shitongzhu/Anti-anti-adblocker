@@ -59,6 +59,9 @@ def dispatch_urls(scripts_dict, curr_site_dir):
                 # separate handling with conditional statements
                 if regexp_offset(js_pos)[0] == '[COND]':
                     source, begin, expr, idx = modify_expr(source, js_pos, is_condstmt=True)
+                    expr = expr.replace(u'\u0022', u'\u005C\u0022')
+                    expr = expr.replace(u"\u000A", u"\u005C\u005C\u006E")
+                    expr = expr.replace(u"\u002C", u"\u005C\u002C")
                     replace_res.write('type: t |' + ' expr: ' + expr + ' | index: ' + str(idx) + ' | offset: ' + js_pos_cleaned + '\n')
                 else:
                     source, begin, expr, idx = modify_expr(source, js_pos, is_condstmt=False)
