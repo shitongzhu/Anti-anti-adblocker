@@ -167,6 +167,7 @@ def merge_log_files(path_to_log_dir, path_to_aggr_log):
 
     for fname in os.listdir(path_to_log_dir):
         site_dict = dict()
+        rule_set = set()
         try:
             diff_file = open(path_to_log_dir + fname + '/diff_res', 'r')
         except IOError:
@@ -213,9 +214,13 @@ def merge_log_files(path_to_log_dir, path_to_aggr_log):
                 stmt_offset = re.match(offset_patt, stmt_offset).groups()[2]
                 if stmt_type == 'i':
                     stmt_expr = stmt_expr[1:][:-1]
-                aggr_log.write('"' + fname + '","' + stmt_url + '",' + stmt_index + ',' + stmt_offset + ',' + \
-                               stmt_type + ',' + stmt_branch + ',"' + stmt_expr + '"\n')
+                rule = '"' + fname + '","' + stmt_url + '",' + stmt_index + ',' + stmt_offset + ',' + \
+                               stmt_type + ',' + stmt_branch + ',"' + stmt_expr + '"\n'
+                rule_set.add(rule)
             curr_line += 1
+        aggr_log.writelines(list(rule_set))
+
+    aggr_log.close()
 
 
 if __name__ == '__main__':
