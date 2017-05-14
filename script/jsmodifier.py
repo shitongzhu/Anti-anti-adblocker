@@ -32,7 +32,7 @@ def dispatch_urls(scripts_dict, curr_site_dir):
 
     offset_pattern = re.compile(OFFSET_INFO)
     url_context = re.compile(CONTEXTUAL_URL)
-    curr_site_js_dir = curr_site_dir + 'modified_js/'
+    #curr_site_js_dir = curr_site_dir + 'modified_js/'
     replace_res = open(curr_site_dir + 'replace_res', 'w+')
     if scripts_dict:
         for key, val in scripts_dict.iteritems():
@@ -44,7 +44,7 @@ def dispatch_urls(scripts_dict, curr_site_dir):
             replace_res.write(js_url + ' -> ' + modified_fname + ' | ' + str(len(val)) + ' replacement(s) | ' +
                               'call stack: ' + context + '\n')
             source = fetch_source(js_url)
-            source_copy = copy.copy(source)
+            #source_copy = copy.copy(source)
             if source == -1:
                 continue
             for pos, count in reversed(sorted(val.iteritems(), key=lambda (k, v): convert_to_global(
@@ -224,4 +224,4 @@ def add_temp_var(source, begin_idx, expr):
     return source_modified
 
 if __name__ == '__main__':
-    modify_expr(requests.get('http://aiondatabase.net/us/').text, 'x729y33o5')
+    modify_expr(requests.get('http://yorkpress.co.uk/').text, 'x4897y31o7599', True)
