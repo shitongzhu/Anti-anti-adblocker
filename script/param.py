@@ -18,7 +18,7 @@ PATH_TO_URLFILE      = '../../res/urllist' + ID + '.txt'
 PATH_TO_LOG          = '/tmp/adblockJSLog' + ID + '.txt'
 PATH_TO_FILTERED_LOG = '../../logs/log' + ID + '/'
 PATH_TO_STAT_FILE    = '../../logs/total_stat'
-PATH_TO_PROFILE      = '../../profiles/profile' + ID + '/'
+PATH_TO_PROFILE      = '../../profiles/profile' + ID + '/Default/'
 PATH_TO_MERGED_LOG   = '../../logs/filterList' + ID + '.csv'
 
 # signals
@@ -82,6 +82,7 @@ KILL_TIMES = 5
 # threshold parameters
 DIFF_THRESHD_W_AB = 0
 DIFF_THRESHD_WO_AB = 0
+LF_THRESHD = 200
 
 # URL for website list stored online
 URL_TO_ADB_LIST = 'https://raw.githubusercontent.com/shadowysean/anti-adblocker-list/master/anti-adb-evaluation-list.txt'
