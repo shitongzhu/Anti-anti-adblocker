@@ -62,12 +62,13 @@ def dump_alexa_sites(top_n):
 
 def download_urllist(url_to_list):
     r = requests.get(url=url_to_list)
-    curr_id = ID
+    browser_id = ID
+    machine_id = LIST_ID
+    instance_id = machine_id * 5 + browser_id
     urllist = r.text.split()
     urllist = map(lambda lne: lne + '\n', urllist)
-    num_of_instances = len(os.listdir(os.getcwd() + '/../'))
-    urllist = urllist[len(urllist) / num_of_instances *
-        int(curr_id):len(urllist) / num_of_instances * (int(curr_id) + 1)]
+    urllist = urllist[len(urllist) / NUM_OF_T_INS *
+        int(instance_id):len(urllist) / NUM_OF_T_INS * (int(instance_id) + 1)]
     with open(PATH_TO_URLFILE, 'w') as f:
         f.writelines(urllist)
     f.close()
@@ -254,6 +255,6 @@ if __name__ == '__main__':
     #print js_dict
     #dispatch_urls(js_dict)
     #dump_alexa_sites(N_TOP_ALEXA)
-    download_urllist(URL_TO_ALEXA_1M)
+    download_urllist(URL_TO_ALEXA_10K)
     #merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)
-    delete_raw_log(PATH_TO_FILTERED_LOG)
+    #delete_raw_log(PATH_TO_FILTERED_LOG)
