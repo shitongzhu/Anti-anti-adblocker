@@ -3,6 +3,7 @@
 
 import os
 import socket
+import requests
 
 # infer our browser id based on working directory
 curr_path = os.getcwd()
@@ -13,7 +14,8 @@ ID = curr_path[-1]
 LIST_ID = curr_hostname[-2]
 
 # total num of instances
-NUM_OF_T_INS = 45
+r = requests.get('https://raw.githubusercontent.com/shadowysean/anti-adblocker-list/master/conf')
+NUM_OF_T_INS = int(r.text[:2])
 
 # paths
 PATH_TO_CHROMIUM     = '../../releases/Release' + ID + '/chrome'
