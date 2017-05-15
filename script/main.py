@@ -266,8 +266,8 @@ def main_loop():
             hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
             hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
             curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
-            #shutil.rmtree(curr_site_dir + 'w_adblocker/')
-            #shutil.rmtree(curr_site_dir + 'wo_adblocker/')
+            shutil.rmtree(curr_site_dir + 'w_adblocker/')
+            shutil.rmtree(curr_site_dir + 'wo_adblocker/')
             log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
 
             js_dict = single_log_stat_analyzer(curr_site_dir)
