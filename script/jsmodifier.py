@@ -20,6 +20,7 @@ def dispatch_urls(scripts_dict, curr_site_dir):
     def convert_to_global(source, x, y, local_oft):
         glob = 0
         x, y, local_oft = int(x), int(y), int(local_oft)
+        x = len(source.splitlines(True)) if x > len(source.splitlines(True)) else x
         for i in range(x):
             glob += len(source.splitlines(True)[i])
         start_of_stmt = glob + y + local_oft

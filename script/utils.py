@@ -215,7 +215,7 @@ def merge_log_files(path_to_log_dir, path_to_aggr_log):
                 if stmt_type == 'i':
                     stmt_expr = stmt_expr[1:][:-1]
                 rule = '"' + fname + '","' + stmt_url + '",' + stmt_index + ',' + stmt_offset + ',' + \
-                               stmt_type + ',' + stmt_branch + ',"' + stmt_expr + '"\n'
+                       stmt_type + ',' + stmt_branch + ',"' + stmt_expr + '"\n'
                 rule_set.add(rule)
             curr_line += 1
         aggr_log.writelines(list(rule_set))
