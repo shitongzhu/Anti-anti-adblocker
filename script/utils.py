@@ -65,7 +65,7 @@ def download_urllist(url_to_list):
     browser_id = int(ID)
     machine_id = int(LIST_ID)
     print '[INFO][util] Current browser ID ->' + str(browser_id) + '; machine ID ->' + str(machine_id)
-    instance_id = machine_id * 5 + browser_id + 1
+    instance_id = machine_id * 5 + browser_id
     print '[INFO][util] Making current instance ID ->' + str(instance_id)
     urllist = r.text.split()
     urllist = map(lambda lne: lne + '\n', urllist)
