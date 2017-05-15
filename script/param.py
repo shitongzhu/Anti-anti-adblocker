@@ -13,7 +13,7 @@ ID = curr_path[-1]
 LIST_ID = curr_hostname[-2]
 
 # total num of instances
-NUM_OF_T_INS = 43
+NUM_OF_T_INS = 45
 
 # paths
 PATH_TO_CHROMIUM     = '../../releases/Release' + ID + '/chrome'
