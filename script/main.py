@@ -55,7 +55,11 @@ def log_extractor(path_to_log, flag_mode, url):
             print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
             return
         elif eles[4] == "CALL":
-            call_stack.append(eles[7][:-1] + "_" + eles[8] + "_" + eles[9].strip())
+            if len(eles) < 10:
+                print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+                return True
+            else:
+                call_stack.append(eles[7][:-1] + "_" + eles[8] + "_" + eles[9].strip())
             return True
         elif eles[4] == "RET":
             if not call_stack:
@@ -274,7 +278,7 @@ def main_loop():
             error_msg = '[FATAL][looper] ' + str(e)
             traceback.print_exc()
             print(error_msg + '\n')
-            error_log = open(PATH_TO_FILTERED_LOG + url + '/error_log', 'w')
+            error_log = open(PATH_TO_FILTERED_LOG + url + '/error_log.txt', 'w')
             error_log.write(str(error_msg))
             error_log.close()
             sync_list_file(PATH_TO_URLFILE)
