@@ -12,7 +12,6 @@ curr_hostname = socket.gethostname()
 # browser id
 ID = curr_path[-1]
 LIST_ID = curr_hostname[-2:]
-print LIST_ID
 
 # total num of instances
 r = requests.get('https://raw.githubusercontent.com/shadowysean/anti-adblocker-list/master/conf')
