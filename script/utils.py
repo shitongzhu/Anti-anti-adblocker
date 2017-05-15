@@ -62,9 +62,11 @@ def dump_alexa_sites(top_n):
 
 def download_urllist(url_to_list):
     r = requests.get(url=url_to_list)
-    browser_id = ID
-    machine_id = LIST_ID
-    instance_id = machine_id * 5 + browser_id
+    browser_id = int(ID)
+    machine_id = int(LIST_ID)
+    print browser_id, machine_id
+    instance_id = machine_id * 5 + browser_id + 1
+    print instance_id
     urllist = r.text.split()
     urllist = map(lambda lne: lne + '\n', urllist)
     urllist = urllist[len(urllist) / NUM_OF_T_INS *
