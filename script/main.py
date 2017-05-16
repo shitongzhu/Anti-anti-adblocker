@@ -136,6 +136,8 @@ def log_differ(path_to_dir, flag_mode, mapping):
             return None
 
     for f in files:
+        already_thened_dict = set()
+        already_elsed_dict = set()
         run_count += 1
         log_file = open(f, 'r')
         lst = log_file.readlines()
@@ -164,10 +166,11 @@ def log_differ(path_to_dir, flag_mode, mapping):
                 else:
                     continue
             elif reg_group_curr[1] == 'THEN':
+                already_thened_dict.add(trace_key_curr)
                 if grand_dict.get(trace_key_curr, -1) == -1:
                     grand_dict[trace_key_curr] = [THIS_POS_HAS_IF_THEN, {run_count}]
                 elif grand_dict[trace_key_curr][0] == THIS_POS_ONLY_HAS_IF and trace_key_curr != trace_key_prev \
-                        and run_count in grand_dict[trace_key_curr][1]:
+                        and run_count in grand_dict[trace_key_curr][1] and trace_key_curr not in already_elsed_dict:
                     grand_dict[trace_key_curr][0] = THIS_POS_HAS_IF_THEN
                     blklist.discard(trace_key_curr)
                 else:
@@ -176,10 +179,11 @@ def log_differ(path_to_dir, flag_mode, mapping):
                     else:
                         grand_dict[trace_key_curr][1].add(run_count)
             elif reg_group_curr[1] == 'ELSE':
+                already_elsed_dict.add(trace_key_curr)
                 if grand_dict.get(trace_key_curr, -1) == -1:
                     grand_dict[trace_key_curr] = [THIS_POS_HAS_IF_ELSE, {run_count}]
                 elif grand_dict[trace_key_curr][0] == THIS_POS_ONLY_HAS_IF and trace_key_curr != trace_key_prev \
-                        and run_count in grand_dict[trace_key_curr][1]:
+                        and run_count in grand_dict[trace_key_curr][1] and trace_key_curr not in already_thened_dict:
                     grand_dict[trace_key_curr][0] = THIS_POS_HAS_IF_ELSE
                     blklist.discard(trace_key_curr)
                 else:
@@ -212,6 +216,7 @@ def log_differ(path_to_dir, flag_mode, mapping):
     for key, val in grand_dict.iteritems():
         if key in blklist or run_count - len(val[1]) > threshold:
             del grand_dict_copy[key]
+
     return grand_dict_copy
 
 
@@ -263,11 +268,11 @@ def main_loop():
                 p2.kill()
                 site_dir2 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB, url=url)
             cache = SignatureMapping()
-            hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
-            hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
+            #hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
+            #hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
             curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
-            shutil.rmtree(curr_site_dir + 'w_adblocker/')
-            shutil.rmtree(curr_site_dir + 'wo_adblocker/')
+            #shutil.rmtree(curr_site_dir + 'w_adblocker/')
+            #shutil.rmtree(curr_site_dir + 'wo_adblocker/')
             log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
 
             js_dict = single_log_stat_analyzer(curr_site_dir)
