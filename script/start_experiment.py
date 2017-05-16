@@ -12,14 +12,18 @@ if __name__ == '__main__':
             flag_deletable = False
             wab_dir = path_to_logs + fname + '/w_adblocker/'
             woab_dir = path_to_logs + fname + '/wo_adblocker/'
-            for f in os.listdir(wab_dir):
-                if not os.path.getsize(wab_dir + f):
-                    shutil.rmtree(path_to_logs + fname)
-                    with open(PATH_TO_URLFILE, "a") as urllist:
-                        urllist.write(fname + '\n')
-                    print '[ERROR][starter] ' + fname + ' is an incomplete log, to be deleted...'
-                    flag_deletable = True
-                    break
+            try:
+                for f in os.listdir(wab_dir):
+                    if not os.path.getsize(wab_dir + f):
+                        shutil.rmtree(path_to_logs + fname)
+                        with open(PATH_TO_URLFILE, "a") as urllist:
+                            urllist.write(fname + '\n')
+                        print '[INFO][starter] ' + fname + ' is an incomplete log, to be deleted...'
+                        flag_deletable = True
+                        break
+            except OSError:
+                print '[ERROR][starter] ' + fname + ' does not have raw log folders, skipping...'
+                continue
             if flag_deletable:
                 continue
             for f in os.listdir(woab_dir):
@@ -27,7 +31,7 @@ if __name__ == '__main__':
                     shutil.rmtree(path_to_logs + fname)
                     with open(PATH_TO_URLFILE, "a") as urllist:
                         urllist.write(fname + '\n')
-                    print '[ERROR][starter] ' + fname + ' is an incomplete log, to be deleted...'
+                    print '[INFO][starter] ' + fname + ' is an incomplete log, to be deleted...'
                     flag_deletable = True
                     break
 
@@ -36,7 +40,7 @@ if __name__ == '__main__':
             os.rename(path_to_logs, path_to_logs + '_old_' + str(int(time.time() * 100)))
         except OSError:
             print '[ERROR][starter] ' + path_to_logs + ' has not been created yet'
-            print '[ERROR][starter] Creating a new one...'
+            print '[INFO][starter] Creating a new one...'
             os.mkdir(path_to_logs)
     if DELETE_RAW_LOG:
         try:
