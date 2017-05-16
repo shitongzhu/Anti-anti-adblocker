@@ -15,7 +15,7 @@ if __name__ == '__main__':
             for f in os.listdir(wab_dir):
                 if not os.path.getsize(wab_dir + f):
                     shutil.rmtree(path_to_logs + fname)
-                    with open(PATH_TO_URLFILE, "w+") as urllist:
+                    with open(PATH_TO_URLFILE, "a") as urllist:
                         urllist.write(fname + '\n')
                     print '[ERROR][starter] ' + fname + ' is an incomplete log, to be deleted...'
                     flag_deletable = True
@@ -25,7 +25,7 @@ if __name__ == '__main__':
             for f in os.listdir(woab_dir):
                 if not os.path.getsize(woab_dir + f):
                     shutil.rmtree(path_to_logs + fname)
-                    with open(PATH_TO_URLFILE, "w+") as urllist:
+                    with open(PATH_TO_URLFILE, "a") as urllist:
                         urllist.write(fname + '\n')
                     print '[ERROR][starter] ' + fname + ' is an incomplete log, to be deleted...'
                     flag_deletable = True
