@@ -268,8 +268,8 @@ def main_loop():
                 p2.kill()
                 site_dir2 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB, url=url)
             cache = SignatureMapping()
-            #hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
-            #hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
+            hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
+            hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
             curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
             #shutil.rmtree(curr_site_dir + 'w_adblocker/')
             #shutil.rmtree(curr_site_dir + 'wo_adblocker/')
