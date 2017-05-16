@@ -34,6 +34,10 @@ if __name__ == '__main__':
                     print '[INFO][starter] ' + fname + ' is an incomplete log, to be deleted...'
                     flag_deletable = True
                     break
+        finished_list = []
+        for fname in os.listdir(path_to_logs):
+            finished_list.append(fname)
+        finished_set = set(finished_list)
 
     if BACKUP_OLD_LOG:
         try:
@@ -42,12 +46,21 @@ if __name__ == '__main__':
             print '[ERROR][starter] ' + path_to_logs + ' has not been created yet'
             print '[INFO][starter] Creating a new one...'
             os.mkdir(path_to_logs)
+
     if DELETE_RAW_LOG:
         try:
             delete_raw_log(path_to_logs)
         except OSError:
             print '[ERROR][starter] ' + path_to_logs + ' has not been created yet, nothing to delete'
+
     if DOWNLOAD_LIST:
-        download_urllist(URL_TO_ALEXA_10K)
+        downloaded_list = download_urllist(URL_TO_ALEXA_10K)
+        downloaded_set = set(downloaded_list)
+        real_set = downloaded_set - finished_set
+        real_list = list(real_set)
+        real_list = map(lambda lne: lne + '\n', real_list)
+        with open(PATH_TO_URLFILE, 'w') as f:
+            f.writelines(real_list)
+
     if RUN_EXP:
         main_loop()

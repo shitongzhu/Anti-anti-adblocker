@@ -68,12 +68,13 @@ def download_urllist(url_to_list):
     instance_id = machine_id * 5 + browser_id
     print '[INFO][util] Making current instance ID ->' + str(instance_id)
     urllist = r.text.split()
-    urllist = map(lambda lne: lne + '\n', urllist)
+    #urllist = map(lambda lne: lne + '\n', urllist)
     urllist = urllist[len(urllist) / NUM_OF_T_INS *
         int(instance_id):len(urllist) / NUM_OF_T_INS * (int(instance_id) + 1)]
-    with open(PATH_TO_URLFILE, 'w') as f:
-        f.writelines(urllist)
-    f.close()
+    #with open(PATH_TO_URLFILE, 'w') as f:
+    #    f.writelines(urllist)
+    #f.close()
+    return urllist
 
 
 def log_stat_analyzer(path_to_filtered_dir):

@@ -99,8 +99,8 @@ URL_TO_ALEXA_10K = 'https://raw.githubusercontent.com/shadowysean/anti-adblocker
 FAKE_HEADER = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2529.0 Safari/537.36'}
 
 # start_experiment conf
-DOWNLOAD_LIST = False
-DELETE_RAW_LOG = True
+DOWNLOAD_LIST = True
+DELETE_RAW_LOG = False
 BACKUP_OLD_LOG = False
 REMOVE_INCOMPLETE_LOGS = True
-RUN_EXP = True
+RUN_EXP = False
