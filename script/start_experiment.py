@@ -6,6 +6,9 @@ from utils import *
 from param import *
 
 if __name__ == '__main__':
+    batch_idx = sys.argv[1]
+    print '[INFO][starter] Current batch index is ' + batch_idx
+
     path_to_logs = os.path.abspath(PATH_TO_FILTERED_LOG) + '/'
     if REMOVE_INCOMPLETE_LOGS:
         for fname in os.listdir(path_to_logs):
@@ -54,7 +57,7 @@ if __name__ == '__main__':
             print '[ERROR][starter] ' + path_to_logs + ' has not been created yet, nothing to delete'
 
     if DOWNLOAD_LIST:
-        downloaded_list = download_urllist(URL_TO_ALEXA_10K)
+        downloaded_list = download_urllist(URL_TO_ALEXA_10K + batch_idx)
         downloaded_set = set(downloaded_list)
         real_set = downloaded_set - finished_set
         real_list = list(real_set)
