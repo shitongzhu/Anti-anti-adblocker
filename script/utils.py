@@ -250,7 +250,19 @@ def delete_raw_log(path_to_log_dir):
             except OSError as e:
                 print "[INFO][util] No existing raw log folders"
             else:
-                print "[INFO][looper] Deleted raw log files"
+                print "[INFO][util] Deleted raw log files"
+
+
+def delete_raw_log_regardless(path_to_log_dir):
+    for fname in os.listdir(path_to_log_dir):
+        try:
+            curr_site_dir = path_to_log_dir + fname + '/'
+            shutil.rmtree(curr_site_dir + 'w_adblocker/')
+            shutil.rmtree(curr_site_dir + 'wo_adblocker/')
+        except OSError as e:
+            print "[INFO][util] No existing raw log folders"
+        else:
+            print "[INFO][util] Deleted raw log files"
 
 if __name__ == '__main__':
     #log_stat_collector(PATH_TO_FILTERED_LOG, PATH_TO_STAT_FILE)
@@ -258,6 +270,7 @@ if __name__ == '__main__':
     #print js_dict
     #dispatch_urls(js_dict)
     #dump_alexa_sites(N_TOP_ALEXA)
-    download_urllist(URL_TO_ALEXA_10K)
+    #download_urllist(URL_TO_ALEXA_10K)
     #merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)
     #delete_raw_log(PATH_TO_FILTERED_LOG)
+    delete_raw_log_regardless(PATH_TO_FILTERED_LOG)
