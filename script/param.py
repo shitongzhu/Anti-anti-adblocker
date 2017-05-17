@@ -15,7 +15,7 @@ LIST_ID = curr_hostname[-2:]
 
 # total num of instances
 r = requests.get('https://raw.githubusercontent.com/shadowysean/anti-adblocker-list/master/conf')
-NUM_OF_T_INS = int(r.text[:2])
+NUM_OF_T_INS = int(r.text[:3])
 
 # paths
 PATH_TO_CHROMIUM     = '../../releases/Release' + ID + '/chrome'
