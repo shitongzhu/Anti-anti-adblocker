@@ -29,14 +29,18 @@ if __name__ == '__main__':
                 continue
             if flag_deletable:
                 continue
-            for f in os.listdir(woab_dir):
-                if not os.path.getsize(woab_dir + f):
-                    shutil.rmtree(path_to_logs + fname)
-                    with open(PATH_TO_URLFILE, "a") as urllist:
-                        urllist.write(fname + '\n')
-                    print '[INFO][starter] ' + fname + ' is an incomplete log, to be deleted...'
-                    flag_deletable = True
-                    break
+            try:
+                for f in os.listdir(woab_dir):
+                    if not os.path.getsize(woab_dir + f):
+                        shutil.rmtree(path_to_logs + fname)
+                        with open(PATH_TO_URLFILE, "a") as urllist:
+                            urllist.write(fname + '\n')
+                        print '[INFO][starter] ' + fname + ' is an incomplete log, to be deleted...'
+                        flag_deletable = True
+                        break
+            except OSError:
+                print '[ERROR][starter] ' + fname + ' does not have raw log folders, skipping...'
+                continue
         finished_list = []
         for fname in os.listdir(path_to_logs):
             finished_list.append(fname)
