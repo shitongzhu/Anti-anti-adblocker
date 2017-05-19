@@ -270,7 +270,7 @@ if __name__ == '__main__':
     #print js_dict
     #dispatch_urls(js_dict)
     #dump_alexa_sites(N_TOP_ALEXA)
-    #download_urllist(URL_TO_ALEXA_10K)
+    download_urllist(URL_TO_ALEXA_10K)
     #merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)
     #delete_raw_log(PATH_TO_FILTERED_LOG)
-    delete_raw_log_regardless(PATH_TO_FILTERED_LOG)
+    #delete_raw_log_regardless(PATH_TO_FILTERED_LOG)
