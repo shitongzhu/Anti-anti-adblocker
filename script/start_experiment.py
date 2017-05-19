@@ -6,6 +6,9 @@ from utils import *
 from param import *
 
 if __name__ == '__main__':
+    #batch_idx = sys.argv[1]
+    #print '[INFO][starter] Current batch index is ' + batch_idx
+
     path_to_logs = os.path.abspath(PATH_TO_FILTERED_LOG) + '/'
     if REMOVE_INCOMPLETE_LOGS:
         for fname in os.listdir(path_to_logs):
@@ -26,14 +29,18 @@ if __name__ == '__main__':
                 continue
             if flag_deletable:
                 continue
-            for f in os.listdir(woab_dir):
-                if not os.path.getsize(woab_dir + f):
-                    shutil.rmtree(path_to_logs + fname)
-                    with open(PATH_TO_URLFILE, "a") as urllist:
-                        urllist.write(fname + '\n')
-                    print '[INFO][starter] ' + fname + ' is an incomplete log, to be deleted...'
-                    flag_deletable = True
-                    break
+            try:
+                for f in os.listdir(woab_dir):
+                    if not os.path.getsize(woab_dir + f):
+                        shutil.rmtree(path_to_logs + fname)
+                        with open(PATH_TO_URLFILE, "a") as urllist:
+                            urllist.write(fname + '\n')
+                        print '[INFO][starter] ' + fname + ' is an incomplete log, to be deleted...'
+                        flag_deletable = True
+                        break
+            except OSError:
+                print '[ERROR][starter] ' + fname + ' does not have raw log folders, skipping...'
+                continue
         finished_list = []
         for fname in os.listdir(path_to_logs):
             finished_list.append(fname)

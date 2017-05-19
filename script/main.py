@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import subprocess
+import signal, psutil
 import time
 import re
 import shutil
@@ -9,7 +10,14 @@ from param import *
 from utils import *
 from SignatureMapping import SignatureMapping
 import traceback
-
+def kill_child_processes(parent_pid, sig=signal.SIGTERM):
+    try:
+      parent = psutil.Process(parent_pid)
+    except psutil.NoSuchProcess:
+      return
+    children = parent.children(recursive=True)
+    for process in children:
+      process.send_signal(sig)
 
 def url_reader(path_to_urllist):
     f = open(path_to_urllist, 'r')
@@ -258,13 +266,16 @@ def main_loop():
                 time.sleep(TIMEOUT_WARMING)
                 p1 = url_loader(url, is_with_ext=True)
                 time.sleep(TIMEOUT_LOAD_W_AB)
+                kill_child_processes(p0.pid)
                 p0.kill()
+                kill_child_processes(p1.pid)
                 p1.kill()
                 site_dir1 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_W_AB, url=url)
 
                 # 2nd pass, with adblock disabled
                 p2 = url_loader(url, is_with_ext=False)
                 time.sleep(TIMEOUT_LOAD_WO_AB)
+                kill_child_processes(p2.pid)
                 p2.kill()
                 site_dir2 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB, url=url)
             cache = SignatureMapping()
