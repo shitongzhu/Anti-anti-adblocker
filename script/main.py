@@ -10,14 +10,17 @@ from param import *
 from utils import *
 from SignatureMapping import SignatureMapping
 import traceback
+
+
 def kill_child_processes(parent_pid, sig=signal.SIGTERM):
     try:
-      parent = psutil.Process(parent_pid)
+        parent = psutil.Process(parent_pid)
     except psutil.NoSuchProcess:
-      return
+        return
     children = parent.children(recursive=True)
     for process in children:
-      process.send_signal(sig)
+        process.send_signal(sig)
+
 
 def url_reader(path_to_urllist):
     f = open(path_to_urllist, 'r')
@@ -56,6 +59,41 @@ def log_extractor(path_to_log, flag_mode, url):
         return
 
     def call_stack_builder(line):
+        if CALL_STACK_WOFT:
+            return call_stack_builder_woft(line)
+        else:
+            return call_stack_builder_wooft(line)
+
+    def call_stack_builder_wooft(line):
+        if len(line) == 1:
+            return
+        eles = line.split(" ")
+        if len(eles) < 5:
+            print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+            return
+        elif eles[4] == "CALL":
+            if len(eles) < 10:
+                print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+                return True
+            else:
+                if eles[7][:-1] == '':
+                    call_stack.append('AnonymousFunc666')
+                else:
+                    call_stack.append(eles[7][:-1] + "_" + eles[8] + "_" + eles[9].strip())
+            return True
+        elif eles[4] == "RET":
+            if not call_stack:
+                print '[ERROR][context] Empty call stack, curr line: ' + line[:-1]
+                return True
+            if len(eles) < 10:
+                print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+                return True
+            elif call_stack[-1] == eles[7][:-1] or (call_stack[-1] == 'AnonymousFunc666' and eles[7][:-1] == ''):
+                call_stack.pop()
+                return True
+        return False
+
+    def call_stack_builder_woft(line):
         if len(line) == 1:
             return
         eles = line.split(" ")

@@ -18,7 +18,7 @@ r = requests.get('https://raw.githubusercontent.com/shadowysean/anti-adblocker-l
 NUM_OF_T_INS = int(r.text[:3])
 
 # paths
-PATH_TO_CHROMIUM     = '../../releases/Release' + ID + '/chrome'
+PATH_TO_CHROMIUM     = '../../browsers/browser' + ID + '/chrome'
 PATH_TO_URLFILE      = '../../res/urllist' + ID + '.txt'
 PATH_TO_LOG          = '/tmp/adblockJSLog' + ID + '.txt'
 PATH_TO_FILTERED_LOG = '../../logs/log' + ID + '/'
@@ -104,3 +104,4 @@ DELETE_RAW_LOG = False
 BACKUP_OLD_LOG = False
 REMOVE_INCOMPLETE_LOGS = True
 RUN_EXP = True
+CALL_STACK_WOFT = False
