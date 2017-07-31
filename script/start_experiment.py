@@ -71,3 +71,6 @@ if __name__ == '__main__':
 
     if RUN_EXP:
         main_loop()
+
+    if AGGREGATE_EXP_RES:
+        merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)

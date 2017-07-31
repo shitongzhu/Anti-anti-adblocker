@@ -71,7 +71,7 @@ THIS_POS_HAS_COND_TRUE = 3
 THIS_POS_HAS_COND_FALSE = 4
 
 # timeout for loading pages (by sec)
-TIMEOUT_LOAD_W_AB = 20
+TIMEOUT_LOAD_W_AB = 23
 TIMEOUT_LOAD_WO_AB = 17
 
 TIMEOUT_WARMING = 3
@@ -79,6 +79,8 @@ TIMEOUT_WARMING = 3
 # command switches for starting Chromium with ABD enabled/disabled
 OPT_W_AB = [PATH_TO_CHROMIUM, '--no-sandbox', '--user-data-dir=' + PATH_TO_PROFILE]
 OPT_WO_AB = [PATH_TO_CHROMIUM, '--no-sandbox', '--disable-extensions', '--user-data-dir=' + PATH_TO_PROFILE]
+
+ADDI_OPT_PROXY = ['--proxy-server=http://0.0.0.0:8080']
 
 XVFB_PREF = "xvfb-run --server-args='-screen 0, 1024x768x24' "
 
@@ -95,12 +97,30 @@ URL_TO_ADB_LIST = 'https://raw.githubusercontent.com/shadowysean/anti-adblocker-
 #URL_TO_ALEXA_1M = 'https://raw.githubusercontent.com/shadowysean/anti-adblocker-list/master/top-1m-' + LIST_ID + '.txt'
 URL_TO_ALEXA_10K = 'https://raw.githubusercontent.com/shadowysean/anti-adblocker-list/master/top-10ka'
 
+# anti-adblocking solution database
+ANTIADB_DATABASE = {
+    'BlockAdblock': 'Place this code snippet near the footer of your page before the close of the /body tag',
+    'FuckAdblock' : 'fuckadblock',
+    'PageFair'    : 'asset.pagefair.com/measure.min.js',
+    'Taboola'     : 'taboola.com',
+    'XenForo'     : 'AdblockDetector/handler.min.js',
+    'UOL family'  : 'Notamos que você tem um adblocker ligado :-'
+}
+
 # fake header
 FAKE_HEADER = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2529.0 Safari/537.36'}
 
 # start_experiment conf
-DOWNLOAD_LIST = True
+DOWNLOAD_LIST = False
 DELETE_RAW_LOG = False
+DELETE_ONGOING_RAW_LOG = False
 BACKUP_OLD_LOG = False
-REMOVE_INCOMPLETE_LOGS = True
-RUN_EXP = True
+REMOVE_INCOMPLETE_LOGS = False
+RUN_EXP = False
+AGGREGATE_EXP_RES = True
+USE_CALL_STACK = True
+USE_CALL_STACK_WOFT = False
+BEHIND_PROXY = False
+USE_SIG_MAPPING = True
+
+DUMMY_LOG_RECORD = '_http://dummy.com/ IF x888y888o888'

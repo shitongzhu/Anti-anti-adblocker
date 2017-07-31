@@ -264,13 +264,44 @@ def delete_raw_log_regardless(path_to_log_dir):
         else:
             print "[INFO][util] Deleted raw log files"
 
+
+def cluster_sites_by_solution():
+    cluster_dict = {
+        'BlockAdblock': 0,
+        'FuckAdblock': 0,
+        'PageFair': 0,
+        'Taboola': 0,
+        'XenForo': 0
+    }
+    f = open(PATH_TO_URLFILE, 'r')
+    lst = f.readlines()
+    print lst
+    for site in lst:
+        url = site.strip()
+        print url
+        try:
+            text = fetch_source('http://' + url)
+        except Exception:
+            print "Connection error, next..."
+            continue
+        if text == -1:
+            print "Connection error, next..."
+            continue
+        for key, value in ANTIADB_DATABASE.iteritems():
+            if value in text:
+                print key
+                cluster_dict[key] += 1
+        print ''
+    print cluster_dict
+
 if __name__ == '__main__':
     #log_stat_collector(PATH_TO_FILTERED_LOG, PATH_TO_STAT_FILE)
     #js_dict = single_log_stat_analyzer(PATH_TO_FILTERED_LOG + 'kbb.com')
     #print js_dict
     #dispatch_urls(js_dict)
     #dump_alexa_sites(N_TOP_ALEXA)
-    download_urllist(URL_TO_ALEXA_10K)
+    #download_urllist(URL_TO_ALEXA_10K)
     #merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)
     #delete_raw_log(PATH_TO_FILTERED_LOG)
     #delete_raw_log_regardless(PATH_TO_FILTERED_LOG)
+    cluster_sites_by_solution()

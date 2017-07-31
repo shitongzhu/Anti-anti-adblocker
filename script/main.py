@@ -10,6 +10,8 @@ from param import *
 from utils import *
 from SignatureMapping import SignatureMapping
 import traceback
+
+
 def kill_child_processes(parent_pid, sig=signal.SIGTERM):
     try:
       parent = psutil.Process(parent_pid)
@@ -19,6 +21,7 @@ def kill_child_processes(parent_pid, sig=signal.SIGTERM):
     for process in children:
       process.send_signal(sig)
 
+
 def url_reader(path_to_urllist):
     f = open(path_to_urllist, 'r')
     lst = f.readline()
@@ -27,18 +30,23 @@ def url_reader(path_to_urllist):
 
 def url_loader(url, is_with_ext):
     is_warming = False if url else True
+    opt_w_ab = OPT_W_AB
+    opt_wo_ab = OPT_WO_AB
+    if BEHIND_PROXY:
+        opt_w_ab += ADDI_OPT_PROXY
+        opt_wo_ab += ADDI_OPT_PROXY
     if is_warming:
         print "[INFO][looper] Warming up Chromium..."
         if is_with_ext:
-            args = OPT_W_AB
+            args = opt_w_ab
         else:
-            args = OPT_WO_AB
+            args = opt_wo_ab
     else:
         print "[INFO][looper] Visiting " + url
         if is_with_ext:
-            args = OPT_W_AB + [url]
+            args = opt_w_ab + [url]
         else:
-            args = OPT_WO_AB + [url]
+            args = opt_wo_ab + [url]
     return subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
 
 
@@ -54,6 +62,73 @@ def log_extractor(path_to_log, flag_mode, url):
         f.writelines(lst)
         f.close()
         return
+
+    '''
+    def call_stack_builder(line):
+        if CALL_STACK_WOFT:
+            return call_stack_builder_woft(line)
+        else:
+            return call_stack_builder_wooft(line)
+    
+    def call_stack_builder_wooft(line):
+        if len(line) == 1:
+            return
+        eles = line.split(" ")
+        if len(eles) < 5:
+            print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+            return
+        elif eles[4] == "CALL":
+            if eles[0] == '(1259,38)':
+                print eles[7][:-1] + ' + ' + str(call_stack)
+            if len(eles) < 10:
+                print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+                return True
+            else:
+                call_stack.append(eles[7][:-1])
+            return True
+        elif eles[4] == "RET":
+            if eles[0] == '(1259,38)':
+                print eles[7][:-1] + ' + ' + str(call_stack)
+            if not call_stack:
+                print '[ERROR][context] Empty call stack, curr line: ' + line[:-1]
+                return True
+            if len(eles) < 10:
+                print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+                return True
+            if call_stack[-1] == eles[7][:-1]:
+                call_stack.pop()
+                return True
+        return False
+
+    def call_stack_builder_woft(line):
+        if len(line) == 1:
+            return
+        eles = line.split(" ")
+        if len(eles) < 5:
+            print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+            return
+        elif eles[4] == "CALL":
+            if eles[0] == '(1259,38)':
+                print eles[7][:-1] + ' + ' + str(call_stack)
+            if len(eles) < 10:
+                print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+                return True
+            else:
+                call_stack.append(eles[7][:-1] + "_" + eles[8] + "_" + eles[9].strip())
+            return True
+        elif eles[4] == "RET":
+            if eles[0] == '(1259,38)':
+                print eles[7][:-1] + ' + ' + str(call_stack)
+            if not call_stack:
+                print '[ERROR][context] Empty call stack, curr line: ' + line[:-1]
+                return True
+            if len(eles) < 10:
+                print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+                return True
+            elif call_stack[-1] == eles[7][:-1] + "_" + eles[8] + "_" + eles[9].strip():
+                call_stack.pop()
+                return True
+        return False
 
     def call_stack_builder(line):
         if len(line) == 1:
@@ -80,12 +155,49 @@ def log_extractor(path_to_log, flag_mode, url):
                 call_stack.pop()
                 return True
         return False
+    '''
+    def call_stack_builder(line):
+        if len(line) == 1:
+            return
+        eles = line.split(" ")
+        if len(eles) < 5:
+            print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+            return
+        elif eles[4] == "CALL":
+            if len(eles) < 10:
+                print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+                return True
+            else:
+                call_stack.append(eles[7][:-1] + "_" + eles[8] + "_" + eles[9].strip())
+            return True
+        elif eles[4] == "RET":
+            if not call_stack:
+                print '[ERROR][context] Empty call stack, curr line: ' + line[:-1]
+                return True
+            if len(eles) < 10:
+                print '[ERROR][looper] Corrupted raw log: ' + line[:-1]
+                return True
+            elif call_stack[-1] == eles[7][:-1] + "_" + eles[8] + "_" + eles[9].strip():
+                call_stack.pop()
+                return True
+        return False
+
+    def transform_cs(call_entry):
+        for i in range(len(call_entry)):
+            while call_entry[i] == '_':
+                return call_entry[0:i]
 
     def get_top_2_caller():
         if len(call_stack) > 2:
-            return call_stack[-2] + "_" + call_stack[-1]
+            if USE_CALL_STACK_WOFT:
+                return call_stack[-2] + "_" + call_stack[-1]
+            else:
+                return transform_cs(call_stack[-2]) + "_" + transform_cs(call_stack[-1])
         elif len(call_stack) == 1:
-            return call_stack[0]
+            if USE_CALL_STACK_WOFT:
+                return call_stack[0]
+            else:
+                return transform_cs(call_stack[0])
         else:
             return ""
 
@@ -103,7 +215,10 @@ def log_extractor(path_to_log, flag_mode, url):
             reg_group = reg_match.groups()
             script_url, stmt_type, position = \
                 reg_group[2], reg_group[3], 'x' + reg_group[0] + 'y' + reg_group[1] + 'o' + reg_group[4]
-            return get_top_2_caller() + '_' + script_url + ' ' + stmt_type + ' ' + position + '\n'
+            if USE_CALL_STACK:
+                return '_' + script_url + ' ' + stmt_type + ' ' + position + '\n'
+            else:
+                return get_top_2_caller() + '_' + script_url + ' ' + stmt_type + ' ' + position + '\n'
         else:
             return None
 
@@ -149,15 +264,21 @@ def log_differ(path_to_dir, flag_mode, mapping):
         run_count += 1
         log_file = open(f, 'r')
         lst = log_file.readlines()
+        lst = [DUMMY_LOG_RECORD] + lst + [DUMMY_LOG_RECORD]
         for idx in range(1, len(lst) - 1):
             reg_group_prev, reg_group_curr, reg_group_next = \
                 regex_match(lst[idx - 1]), regex_match(lst[idx]), regex_match(lst[idx + 1])
             if reg_group_curr is None or reg_group_next is None or reg_group_prev is None:
                 continue
 
-            trace_key_curr = mapping.map_to_compact(reg_group_curr[0] + ' ' + reg_group_curr[2])
-            trace_key_next = mapping.map_to_compact(reg_group_next[0] + ' ' + reg_group_next[2])
-            trace_key_prev = mapping.map_to_compact(reg_group_prev[0] + ' ' + reg_group_prev[2])
+            if USE_SIG_MAPPING:
+                trace_key_curr = mapping.map_to_compact(reg_group_curr[0] + ' ' + reg_group_curr[2])
+                trace_key_next = mapping.map_to_compact(reg_group_next[0] + ' ' + reg_group_next[2])
+                trace_key_prev = mapping.map_to_compact(reg_group_prev[0] + ' ' + reg_group_prev[2])
+            else:
+                trace_key_curr = reg_group_curr[0] + ' ' + reg_group_curr[2]
+                trace_key_next = reg_group_next[0] + ' ' + reg_group_next[2]
+                trace_key_prev = reg_group_prev[0] + ' ' + reg_group_prev[2]
 
             if reg_group_curr[1] == 'IF':
                 if trace_key_curr != trace_key_next \
@@ -166,6 +287,8 @@ def log_differ(path_to_dir, flag_mode, mapping):
                         grand_dict[trace_key_curr] = [THIS_POS_ONLY_HAS_IF, {run_count}]
                     else:
                         if grand_dict[trace_key_curr][0] != THIS_POS_ONLY_HAS_IF:
+                            if trace_key_curr == '__http://www.xlovecash.com/ o2':
+                                print "just blacklisted!!! 1"
                             grand_dict[trace_key_curr][0] = THIS_POS_ONLY_HAS_IF
                             grand_dict[trace_key_curr][1].add(run_count)
                             blklist.add(trace_key_curr)
@@ -183,6 +306,8 @@ def log_differ(path_to_dir, flag_mode, mapping):
                     blklist.discard(trace_key_curr)
                 else:
                     if grand_dict[trace_key_curr][0] != THIS_POS_HAS_IF_THEN:
+                        if trace_key_curr == '__http://www.xlovecash.com/ o2':
+                            print "just blacklisted!!! 2"
                         blklist.add(trace_key_curr)
                     else:
                         grand_dict[trace_key_curr][1].add(run_count)
@@ -196,6 +321,8 @@ def log_differ(path_to_dir, flag_mode, mapping):
                     blklist.discard(trace_key_curr)
                 else:
                     if grand_dict[trace_key_curr][0] != THIS_POS_HAS_IF_ELSE:
+                        if trace_key_curr == '__http://www.xlovecash.com/ o2':
+                            print "just blacklisted!!! 3"
                         blklist.add(trace_key_curr)
                     else:
                         grand_dict[trace_key_curr][1].add(run_count)
@@ -238,8 +365,12 @@ def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab, mapping):
             continue
         if curr_val[0] != value[0]:
             flag_flipping = True
-            match_mark = "Unmatched: pos " + mapping.map_to_full(str(key)) + " abp-on " + str(dict_w_ab.get(key, -1)) \
+            if USE_SIG_MAPPING:
+                match_mark = "Unmatched: pos " + mapping.map_to_full(str(key)) + " abp-on " + str(dict_w_ab.get(key, -1)) \
                          + " abp-off " + str(dict_wo_ab.get(key, -1))
+            else:
+                match_mark = "Unmatched: pos " + str(key) + " abp-on " + str(dict_w_ab.get(key, -1)) + \
+                             " abp-off " + str(dict_wo_ab.get(key, -1))
             f.write(match_mark + '\n')
             print '[INFO][looper] ' + match_mark
     if flag_flipping is False:
@@ -282,8 +413,9 @@ def main_loop():
             hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
             hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
             curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
-            shutil.rmtree(curr_site_dir + 'w_adblocker/')
-            shutil.rmtree(curr_site_dir + 'wo_adblocker/')
+            if DELETE_ONGOING_RAW_LOG:
+                shutil.rmtree(curr_site_dir + 'w_adblocker/')
+                shutil.rmtree(curr_site_dir + 'wo_adblocker/')
             log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
 
             js_dict = single_log_stat_analyzer(curr_site_dir)
