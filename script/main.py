@@ -32,6 +32,8 @@ def url_loader(url, is_with_ext):
     is_warming = False if url else True
     opt_w_ab = OPT_W_AB
     opt_wo_ab = OPT_WO_AB
+    if VERIFY_RUN:
+        opt_w_ab = opt_wo_ab
     if BEHIND_PROXY:
         opt_w_ab += ADDI_OPT_PROXY
         opt_wo_ab += ADDI_OPT_PROXY
