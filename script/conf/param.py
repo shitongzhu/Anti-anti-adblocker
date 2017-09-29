@@ -111,12 +111,14 @@ ANTIADB_DATABASE = {
 FAKE_HEADER = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2529.0 Safari/537.36'}
 
 # start_experiment conf
+DISTRIBUTE_URLLIST = False
+FETCH_URL = False
 DOWNLOAD_LIST = False
 DELETE_RAW_LOG = False
 DELETE_ONGOING_RAW_LOG = False
 BACKUP_OLD_LOG = False
 REMOVE_INCOMPLETE_LOGS = False
-RUN_EXP = True
+RUN_EXP = False
 AGGREGATE_EXP_RES = True
 USE_CALL_STACK = True
 USE_CALL_STACK_WOFT = False

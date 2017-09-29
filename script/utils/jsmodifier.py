@@ -1,16 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import requests
-import time
-from lxml import html
-from bs4 import BeautifulSoup
-from param import *
-import os
-import copy
-from ssl import SSLError
 import re
 import sys
+import time
+from ssl import SSLError
+
+from bs4 import BeautifulSoup
+
+from script.conf.param import *
 
 reload(sys)
 sys.setdefaultencoding('utf-8')

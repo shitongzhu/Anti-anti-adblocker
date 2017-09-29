@@ -1,6 +1,5 @@
-from main import *
-from SignatureMapping import SignatureMapping
-from param import *
+from script.conf.param import *
+from script.modules.main import *
 
 if __name__ == '__main__':
     cache = SignatureMapping()

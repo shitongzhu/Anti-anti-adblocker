@@ -1,15 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
-import re
-import shutil
 import operator
+import shutil
 from time import gmtime, strftime
-from param import *
-#import alexa
-from jsmodifier import *
+
 import requests
+
+# import alexa
+from script.utils.jsmodifier import *
 
 
 def log_stat_collector(path_to_filtered_dir, path_to_stat_file):

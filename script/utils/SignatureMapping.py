@@ -1,5 +1,6 @@
 import re
-from param import *
+
+from script.conf.param import *
 
 
 class SignatureMapping(object):

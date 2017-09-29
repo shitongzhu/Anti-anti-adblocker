@@ -1,15 +1,41 @@
-import os
-import sys
-import time
-from main import main_loop
-from utils import *
-from param import *
+import argparse
+
+from script.conf.param import *
+from script.utils.utils import *
+from script.modules.main import main_loop
+from script.modules.work_queue import submit_urllist
+from script.modules.worker import fetch_url
+
+parser = argparse.ArgumentParser(description='Testing arg parser...')
+parser.add_argument('--dlList', dest='DOWNLOAD_LIST', action='store_true')
+parser.add_argument('--delRawLog', dest='DELETE_RAW_LOG', action='store_true')
+parser.add_argument('--delOngRawLog', dest='DELETE_ONGOING_RAW_LOG', action='store_true')
+parser.add_argument('--bkupOldLog', dest='BACKUP_OLD_LOG', action='store_true')
+parser.add_argument('--revIncomLog', dest='REMOVE_INCOMPLETE_LOGS', action='store_true')
+parser.add_argument('--run', dest='RUN_EXP', action='store_true')
+parser.add_argument('--aggrRes', dest='AGGREGATE_EXP_RES', action='store_true')
+parser.add_argument('--useCallStack', dest='USE_CALL_STACK', action='store_true')
+parser.add_argument('--useCallStackWOft', dest='USE_CALL_STACK_WOFT', action='store_true')
+parser.add_argument('--sbmtList', dest='DISTRIBUTE_URLLIST', action='store_true')
+parser.add_argument('--fchURL', dest='FETCH_URL', action='store_true')
+parser.add_argument('--behindProxy', dest='BEHIND_PROXY', action='store_true')
+parser.add_argument('--useSigMapp', dest='USE_SIG_MAPPING', action='store_true')
+parser.add_argument('--verifyRun', dest='VERIFY_RUN', action='store_true')
+parser.add_argument('--browserID', dest='ID', action='store')
+parser.add_argument('--hostID', dest='LIST_ID', action='store')
+args = parser.parse_args()
+for key, value in args.__dict__.iteritems():
+    exec(key + ' = ' + str(value))
 
 if __name__ == '__main__':
-    #batch_idx = sys.argv[1]
-    #print '[INFO][starter] Current batch index is ' + batch_idx
-
     path_to_logs = os.path.abspath(PATH_TO_FILTERED_LOG) + '/'
+
+    if DISTRIBUTE_URLLIST:
+        submit_urllist()
+
+    if FETCH_URL:
+        fetch_url()
+
     if REMOVE_INCOMPLETE_LOGS:
         for fname in os.listdir(path_to_logs):
             flag_deletable = False

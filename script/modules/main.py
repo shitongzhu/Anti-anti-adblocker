@@ -1,15 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import signal
 import subprocess
-import signal, psutil
-import time
-import re
-import shutil
-from param import *
-from utils import *
-from SignatureMapping import SignatureMapping
 import traceback
+
+import psutil
+
+from script.utils.SignatureMapping import SignatureMapping
+from script.utils.utils import *
+from script.modules.worker import fetch_url
 
 
 def kill_child_processes(parent_pid, sig=signal.SIGTERM):
@@ -382,9 +382,11 @@ def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab, mapping):
 
 
 def main_loop():
-    while url_reader(PATH_TO_URLFILE):
+    while True:
         try:
-            url = url_reader(PATH_TO_URLFILE)
+            url = fetch_url()
+            if not url:
+                break
             try:
                 shutil.rmtree(PATH_TO_FILTERED_LOG + url)
             except OSError as err:
@@ -422,7 +424,7 @@ def main_loop():
 
             js_dict = single_log_stat_analyzer(curr_site_dir)
             dispatch_urls(js_dict, curr_site_dir)
-            sync_list_file(PATH_TO_URLFILE)
+            #sync_list_file(PATH_TO_URLFILE)
             print '[INFO][looper] This site is done\n'
         except Exception as e:
             error_msg = '[FATAL][looper] ' + str(e)
@@ -431,7 +433,7 @@ def main_loop():
             error_log = open(PATH_TO_FILTERED_LOG + url + '/error_log.txt', 'w')
             error_log.write(str(error_msg))
             error_log.close()
-            sync_list_file(PATH_TO_URLFILE)
+            #sync_list_file(PATH_TO_URLFILE)
             continue
 
     print '[INFO][looper] A batch of experiments are done!'
