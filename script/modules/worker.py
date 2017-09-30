@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 import pika
+from script.conf.param import *
 
 url_fetched = ''
 
 
 def fetch_url():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=DISPATCHER_HOST))
     channel = connection.channel()
 
     channel.queue_declare(queue='task_queue', durable=True)

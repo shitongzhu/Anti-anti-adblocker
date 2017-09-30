@@ -127,3 +127,5 @@ USE_SIG_MAPPING = True
 VERIFY_RUN = False
 
 DUMMY_LOG_RECORD = '_http://dummy.com/ IF x888y888o888'
+
+DISPATCHER_HOST = 'ec2-54-183-178-81.us-west-1.compute.amazonaws.com'

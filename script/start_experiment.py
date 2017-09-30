@@ -23,6 +23,7 @@ parser.add_argument('--useSigMapp', dest='USE_SIG_MAPPING', action='store_true')
 parser.add_argument('--verifyRun', dest='VERIFY_RUN', action='store_true')
 parser.add_argument('--browserID', dest='ID', action='store')
 parser.add_argument('--hostID', dest='LIST_ID', action='store')
+parser.add_argument('--dispatchHost', dest='LIST_ID', action='store')
 args = parser.parse_args()
 for key, value in args.__dict__.iteritems():
     exec(key + ' = ' + str(value))
