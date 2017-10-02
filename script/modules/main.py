@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import signal
 import subprocess
 import traceback
 
@@ -12,14 +11,14 @@ from script.utils.utils import *
 from script.modules.worker import fetch_url
 
 
-def kill_child_processes(parent_pid, sig=signal.SIGTERM):
+def kill_child_processes(parent_pid):
     try:
-      parent = psutil.Process(parent_pid)
+        parent = psutil.Process(parent_pid)
     except psutil.NoSuchProcess:
-      return
-    children = parent.children(recursive=True)
-    for process in children:
-      process.send_signal(sig)
+        return
+    for child in parent.children(recursive=True):
+        child.kill()
+    parent.kill()
 
 
 def url_reader(path_to_urllist):
