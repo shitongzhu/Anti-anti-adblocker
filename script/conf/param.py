@@ -18,13 +18,16 @@ r = requests.get('https://raw.githubusercontent.com/shadowysean/anti-adblocker-l
 NUM_OF_T_INS = int(r.text[:3])
 
 # paths
-PATH_TO_CHROMIUM     = '../../releases/Release' + ID + '/chrome'
+PATH_TO_CHROMIUM     = '/home/shitong/Desktop/diffexecproj/offline/releases/Release2/chrome'
 PATH_TO_URLFILE      = '../../res/urllist' + ID + '.txt'
 PATH_TO_LOG          = '/tmp/adblockJSLog' + ID + '.txt'
 PATH_TO_FILTERED_LOG = '../../logs/log' + ID + '/'
 PATH_TO_STAT_FILE    = '../../logs/total_stat'
-PATH_TO_PROFILE      = '../../profiles/profile' + ID + '/Default/'
+#PATH_TO_PROFILE      = '../../profiles/profile' + ID + '/Default/'
+PATH_TO_PROFILE      = '/home/shitong/Desktop/diffexecproj/offline/profiles/profile1/Default/'
 PATH_TO_MERGED_LOG   = '../../logs/filterList' + ID + '.csv'
+PATH_TO_ADB          = '../../res/adblockpluschrome.crx'
+PATH_TO_WEBDRIVER    = '../../bin/chromedriver'
 
 # signals
 SIGSUCCESS = 1
@@ -75,6 +78,8 @@ TIMEOUT_LOAD_W_AB = 23
 TIMEOUT_LOAD_WO_AB = 17
 
 TIMEOUT_WARMING = 3
+
+TIMEOUT_OF_WEBDRIVER = 2
 
 # command switches for starting Chromium with ABD enabled/disabled
 OPT_W_AB = [PATH_TO_CHROMIUM, '--no-sandbox', '--user-data-dir=' + PATH_TO_PROFILE]

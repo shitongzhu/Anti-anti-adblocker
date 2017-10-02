@@ -4,6 +4,8 @@
 import signal
 import subprocess
 import traceback
+from selenium import webdriver
+from selenium.common.exceptions import *
 
 import psutil
 
@@ -14,12 +16,12 @@ from script.modules.worker import fetch_url
 
 def kill_child_processes(parent_pid, sig=signal.SIGTERM):
     try:
-      parent = psutil.Process(parent_pid)
+        parent = psutil.Process(parent_pid)
     except psutil.NoSuchProcess:
-      return
+        return
     children = parent.children(recursive=True)
     for process in children:
-      process.send_signal(sig)
+        process.send_signal(sig)
 
 
 def url_reader(path_to_urllist):
@@ -27,7 +29,7 @@ def url_reader(path_to_urllist):
     lst = f.readline()
     return lst.strip()
 
-
+'''
 def url_loader(url, is_with_ext):
     is_warming = False if url else True
     opt_w_ab = OPT_W_AB
@@ -50,6 +52,28 @@ def url_loader(url, is_with_ext):
         else:
             args = opt_wo_ab + [url]
     return subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+'''
+
+
+def _setup_webdriver(use_adb):
+    chrome_options = webdriver.ChromeOptions()
+    #chrome_options.add_argument("--proxy-server={0}".format(self.proxy.proxy))
+    if use_adb:
+        chrome_options.add_extension(PATH_TO_ADB)
+    chrome_options.binary_location = PATH_TO_CHROMIUM
+    #chrome_options.add_argument('user-data-dir=' + PATH_TO_PROFILE)
+    browser = webdriver.Chrome(executable_path=PATH_TO_WEBDRIVER, chrome_options=chrome_options)
+    return browser
+
+
+def url_loader(url, use_adb):
+    if use_adb:
+        browser = _setup_webdriver(use_adb=False)
+        browser.get('http://' + url)
+    else:
+        browser = _setup_webdriver(use_adb=True)
+        browser.get('http://' + url)
+    browser.quit()
 
 
 def log_extractor(path_to_log, flag_mode, url):
@@ -397,6 +421,7 @@ def main_loop():
             for i in range(NUM_OF_RUNS):
                 # 1st pass, with adblock enabled
                 # tick its runtime
+                '''
                 p0 = url_loader(None, is_with_ext=True)
                 time.sleep(TIMEOUT_WARMING)
                 p1 = url_loader(url, is_with_ext=True)
@@ -405,13 +430,18 @@ def main_loop():
                 p0.kill()
                 kill_child_processes(p1.pid)
                 p1.kill()
+                '''
+                url_loader(url, False)
                 site_dir1 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_W_AB, url=url)
 
                 # 2nd pass, with adblock disabled
+                '''
                 p2 = url_loader(url, is_with_ext=False)
                 time.sleep(TIMEOUT_LOAD_WO_AB)
                 kill_child_processes(p2.pid)
                 p2.kill()
+                '''
+                url_loader(url, True)
                 site_dir2 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB, url=url)
             cache = SignatureMapping()
             hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
