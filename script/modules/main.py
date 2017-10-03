@@ -15,9 +15,14 @@ def kill_child_processes(parent_pid):
     try:
         parent = psutil.Process(parent_pid)
     except psutil.NoSuchProcess:
+        print '[ERROR][loader] No such process with PID ' + str(parent_pid)
         return
     for child in parent.children(recursive=True):
-        child.kill()
+        try:
+            child.kill()
+        except psutil.NoSuchProcess:
+            print '[ERROR][loader] No such process with PID ' + str(child.pid)
+            continue
     parent.kill()
 
 
