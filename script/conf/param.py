@@ -5,6 +5,7 @@ import os
 import socket
 import requests
 
+
 # infer our browser id based on working directory
 curr_path = os.getcwd()
 curr_hostname = socket.gethostname()
@@ -115,7 +116,7 @@ DISTRIBUTE_URLLIST = False
 FETCH_URL = False
 DOWNLOAD_LIST = False
 DELETE_RAW_LOG = False
-DELETE_ONGOING_RAW_LOG = False
+DELETE_ONGOING_RAW_LOG = True
 BACKUP_OLD_LOG = False
 REMOVE_INCOMPLETE_LOGS = False
 RUN_EXP = False

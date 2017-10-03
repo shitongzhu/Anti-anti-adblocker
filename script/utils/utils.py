@@ -5,7 +5,6 @@ import operator
 import shutil
 from time import gmtime, strftime
 
-import requests
 
 # import alexa
 from script.utils.jsmodifier import *

@@ -422,6 +422,7 @@ def main_loop():
             hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
             curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
             if DELETE_ONGOING_RAW_LOG:
+                print '[INFO][switch] Ongoing raw log removal enabled!'
                 shutil.rmtree(curr_site_dir + 'w_adblocker/')
                 shutil.rmtree(curr_site_dir + 'wo_adblocker/')
             log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)

@@ -1,6 +1,4 @@
 import argparse
-
-from script.conf.param import *
 from script.utils.utils import *
 from script.modules.main import main_loop
 from script.modules.work_queue import submit_urllist
@@ -23,10 +21,13 @@ parser.add_argument('--useSigMapp', dest='USE_SIG_MAPPING', action='store_true')
 parser.add_argument('--verifyRun', dest='VERIFY_RUN', action='store_true')
 parser.add_argument('--browserID', dest='ID', action='store')
 parser.add_argument('--hostID', dest='LIST_ID', action='store')
-parser.add_argument('--dispatchHost', dest='LIST_ID', action='store')
-args = parser.parse_args()
-for key, value in args.__dict__.iteritems():
-    exec(key + ' = ' + str(value))
+parser.add_argument('--dispatchHost', dest='DISPATCHER_HOST', action='store')
+parser.add_argument('--loadToutWADB', dest='TIMEOUT_LOAD_W_AB', action='store')
+parser.add_argument('--loadToutWoADB', dest='TIMEOUT_LOAD_WO_AB', action='store')
+parsed_args = parser.parse_args()
+
+for key, value in parsed_args.__dict__.iteritems():
+    exec (key + ' = ' + str(value))
 
 if __name__ == '__main__':
     path_to_logs = os.path.abspath(PATH_TO_FILTERED_LOG) + '/'
