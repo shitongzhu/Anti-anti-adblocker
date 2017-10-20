@@ -4,6 +4,7 @@
 import operator
 import shutil
 from time import gmtime, strftime
+import csv
 
 
 # import alexa
@@ -292,6 +293,40 @@ def cluster_sites_by_solution():
         print ''
     print cluster_dict
 
+
+def compare_two_rlists(path_l1, path_l2, path_rank=None):
+    def read_rlist(path):
+        rules = set()
+        with open(path) as csvfile:
+            reader = csv.reader(csvfile, doublequote=False, escapechar='\\')
+            for row in reader:
+                # ignore comments
+                if (len(row) >= 6) and not (row[0][0] == "#"):
+                    rules.add(row[0])
+        return rules
+
+    def read_rank(path):
+        rank = []
+        with open(path) as csvfile:
+            reader = csv.reader(csvfile, doublequote=False, escapechar='\\')
+            for row in reader:
+                # ignore comments
+                if row[0][0] != "#":
+                    rank.append(row[0])
+        return rank
+    rule_set_1 = read_rlist(path_l1)
+    rule_set_2 = read_rlist(path_l2)
+    res_set = set()
+    rank_list = read_rank(path_rank)
+    print len(rule_set_1), len(rule_set_2)
+    diff_set = rule_set_1 ^ rule_set_2
+    for i in range(5000):
+        if rank_list[i] in diff_set:
+            print rank_list[i]
+            res_set.add(rank_list[i])
+    print len(res_set)
+
+
 if __name__ == '__main__':
     #log_stat_collector(PATH_TO_FILTERED_LOG, PATH_TO_STAT_FILE)
     #js_dict = single_log_stat_analyzer(PATH_TO_FILTERED_LOG + 'kbb.com')
@@ -300,6 +335,7 @@ if __name__ == '__main__':
     #dump_alexa_sites(N_TOP_ALEXA)
     #download_urllist(URL_TO_ALEXA_10K)
     #merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)
+    compare_two_rlists('../../logs/filterList1.csv', '../../logs/filterList2.csv', '../../logs/rank.csv')
     #delete_raw_log(PATH_TO_FILTERED_LOG)
     #delete_raw_log_regardless(PATH_TO_FILTERED_LOG)
-    cluster_sites_by_solution()
+    #cluster_sites_by_solution()
