@@ -42,7 +42,7 @@ YES_KEYWORDS = [
 ]
 
 # number of runs stuff
-NUM_OF_RUNS = 3
+NUM_OF_RUNS = 6
 N_TOP_ALEXA = 1000
 
 # flags
@@ -72,8 +72,8 @@ THIS_POS_HAS_COND_TRUE = 3
 THIS_POS_HAS_COND_FALSE = 4
 
 # timeout for loading pages (by sec)
-TIMEOUT_LOAD_W_AB = 23
-TIMEOUT_LOAD_WO_AB = 17
+TIMEOUT_LOAD_W_AB = 30
+TIMEOUT_LOAD_WO_AB = 30
 
 TIMEOUT_WARMING = 3
 
