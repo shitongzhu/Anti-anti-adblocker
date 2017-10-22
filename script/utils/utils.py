@@ -328,14 +328,14 @@ def compare_two_rlists(path_l1, path_l2, path_rank=None):
 
 
 if __name__ == '__main__':
-    #log_stat_collector(PATH_TO_FILTERED_LOG, PATH_TO_STAT_FILE)
+    log_stat_collector(PATH_TO_FILTERED_LOG, PATH_TO_STAT_FILE)
     #js_dict = single_log_stat_analyzer(PATH_TO_FILTERED_LOG + 'kbb.com')
     #print js_dict
     #dispatch_urls(js_dict)
     #dump_alexa_sites(N_TOP_ALEXA)
     #download_urllist(URL_TO_ALEXA_10K)
     #merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)
-    compare_two_rlists('../../logs/filterList1.csv', '../../logs/filterList2.csv', '../../logs/rank.csv')
+    #compare_two_rlists('../../logs/filterList1.csv', '../../logs/filterList2.csv', '../../logs/rank.csv')
     #delete_raw_log(PATH_TO_FILTERED_LOG)
     #delete_raw_log_regardless(PATH_TO_FILTERED_LOG)
     #cluster_sites_by_solution()
