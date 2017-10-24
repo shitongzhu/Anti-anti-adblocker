@@ -267,6 +267,7 @@ def log_differ(path_to_dir, flag_mode, mapping):
     for f in files:
         already_thened_dict = set()
         already_elsed_dict = set()
+        already_ifed_dict = {}
         run_count += 1
         log_file = open(f, 'r')
         lst = log_file.readlines()
@@ -287,14 +288,16 @@ def log_differ(path_to_dir, flag_mode, mapping):
                 trace_key_prev = reg_group_prev[0] + ' ' + reg_group_prev[2]
 
             if reg_group_curr[1] == 'IF':
+                if already_ifed_dict.get(trace_key_curr, -1) == -1:
+                    already_ifed_dict[trace_key_curr] = 1
+                else:
+                    already_ifed_dict[trace_key_curr] += 1
                 if trace_key_curr != trace_key_next \
                         or (trace_key_curr == trace_key_next and reg_group_next[1] == 'IF'):
                     if grand_dict.get(trace_key_curr, -1) == -1:
                         grand_dict[trace_key_curr] = [THIS_POS_ONLY_HAS_IF, {run_count}]
                     else:
                         if grand_dict[trace_key_curr][0] != THIS_POS_ONLY_HAS_IF:
-                            if trace_key_curr == '__http://www.xlovecash.com/ o2':
-                                print "just blacklisted!!! 1"
                             grand_dict[trace_key_curr][0] = THIS_POS_ONLY_HAS_IF
                             grand_dict[trace_key_curr][1].add(run_count)
                             blklist.add(trace_key_curr)
@@ -307,13 +310,12 @@ def log_differ(path_to_dir, flag_mode, mapping):
                 if grand_dict.get(trace_key_curr, -1) == -1:
                     grand_dict[trace_key_curr] = [THIS_POS_HAS_IF_THEN, {run_count}]
                 elif grand_dict[trace_key_curr][0] == THIS_POS_ONLY_HAS_IF and trace_key_curr != trace_key_prev \
-                        and run_count in grand_dict[trace_key_curr][1] and trace_key_curr not in already_elsed_dict:
+                        and run_count in grand_dict[trace_key_curr][1] and trace_key_curr not in already_elsed_dict \
+                        and already_ifed_dict[trace_key_curr] == 1:
                     grand_dict[trace_key_curr][0] = THIS_POS_HAS_IF_THEN
                     blklist.discard(trace_key_curr)
                 else:
                     if grand_dict[trace_key_curr][0] != THIS_POS_HAS_IF_THEN:
-                        if trace_key_curr == '__http://www.xlovecash.com/ o2':
-                            print "just blacklisted!!! 2"
                         blklist.add(trace_key_curr)
                     else:
                         grand_dict[trace_key_curr][1].add(run_count)
@@ -322,13 +324,12 @@ def log_differ(path_to_dir, flag_mode, mapping):
                 if grand_dict.get(trace_key_curr, -1) == -1:
                     grand_dict[trace_key_curr] = [THIS_POS_HAS_IF_ELSE, {run_count}]
                 elif grand_dict[trace_key_curr][0] == THIS_POS_ONLY_HAS_IF and trace_key_curr != trace_key_prev \
-                        and run_count in grand_dict[trace_key_curr][1] and trace_key_curr not in already_thened_dict:
+                        and run_count in grand_dict[trace_key_curr][1] and trace_key_curr not in already_thened_dict \
+                        and already_ifed_dict[trace_key_curr] == 1:
                     grand_dict[trace_key_curr][0] = THIS_POS_HAS_IF_ELSE
                     blklist.discard(trace_key_curr)
                 else:
                     if grand_dict[trace_key_curr][0] != THIS_POS_HAS_IF_ELSE:
-                        if trace_key_curr == '__http://www.xlovecash.com/ o2':
-                            print "just blacklisted!!! 3"
                         blklist.add(trace_key_curr)
                     else:
                         grand_dict[trace_key_curr][1].add(run_count)
@@ -476,5 +477,12 @@ def call_stack_test():
 
 
 if __name__ == '__main__':
-    main_loop()
+    url = 'baidu.com'
+    site_dir1 = (PATH_TO_FILTERED_LOG + url + '/w_adblocker/')
+    site_dir2 = (PATH_TO_FILTERED_LOG + url + '/wo_adblocker/')
+    cache = SignatureMapping()
+    hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
+    hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
+    curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
+    log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
     #call_stack_test()
