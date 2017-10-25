@@ -477,12 +477,17 @@ def call_stack_test():
 
 
 if __name__ == '__main__':
-    url = 'yesky.com'
-    site_dir1 = (PATH_TO_FILTERED_LOG + url + '/w_adblocker/')
-    site_dir2 = (PATH_TO_FILTERED_LOG + url + '/wo_adblocker/')
-    cache = SignatureMapping()
-    hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
-    hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
-    curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
-    log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
+    files = []
+    for fname in os.listdir(PATH_TO_FILTERED_LOG):
+        files.append(PATH_TO_FILTERED_LOG + fname)
+    print len(files)
+    for url in files:
+        print url
+        site_dir1 = (url + '/w_adblocker/')
+        site_dir2 = (url + '/wo_adblocker/')
+        cache = SignatureMapping()
+        hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
+        hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
+        curr_site_dir = url + '/'
+        log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
     #call_stack_test()
