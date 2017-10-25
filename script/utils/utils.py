@@ -24,10 +24,13 @@ def log_stat_collector(path_to_filtered_dir, path_to_stat_file):
             print '[INFO][util] ' + fname + " is not yet finished"
             continue
         diff_content = diff_file.readlines()
-        if diff_content[0] == 'No unmatch detected!\n':
-            curr_negative.add(fname)
-        else:
-            curr_positive.add(fname)
+        try:
+            if diff_content[0] == 'No unmatch detected!\n':
+                curr_negative.add(fname)
+            else:
+                curr_positive.add(fname)
+        except IndexError:
+            continue
         diff_file.close()
     fstat.write('\n>> Negative sites:\n')
     for r in list(curr_negative):
@@ -178,21 +181,24 @@ def merge_log_files(path_to_log_dir, path_to_aggr_log):
             print '[ERROR][util] ' + fname + " is not yet finished"
             continue
         diff_content = diff_file.readlines()
-        if diff_content[0] == 'No unmatch detected!\n':
+        try:
+            if diff_content[0] == 'No unmatch detected!\n':
+                continue
+            else:
+                for l in diff_content:
+                    diff_res_entry_match = re.match(diff_res_entry, l)
+                    diff_res_entry_group = diff_res_entry_match.groups()
+                    stmt_contextual_url, stmt_pos = diff_res_entry_group[0], diff_res_entry_group[1]
+
+                    contextual_url_group = re.match(contextual_url, stmt_contextual_url).groups()
+                    stmt_url = contextual_url_group[1]
+
+                    stmt_branch = 'true' if diff_res_entry_group[3] in {'1', '3'} else 'false'
+                    stmt_key = stmt_url + ' ' + stmt_pos
+                    stmt_value = stmt_branch
+                    site_dict[stmt_key] = stmt_value
+        except IndexError:
             continue
-        else:
-            for l in diff_content:
-                diff_res_entry_match = re.match(diff_res_entry, l)
-                diff_res_entry_group = diff_res_entry_match.groups()
-                stmt_contextual_url, stmt_pos = diff_res_entry_group[0], diff_res_entry_group[1]
-
-                contextual_url_group = re.match(contextual_url, stmt_contextual_url).groups()
-                stmt_url = contextual_url_group[1]
-
-                stmt_branch = 'true' if diff_res_entry_group[3] in {'1', '3'} else 'false'
-                stmt_key = stmt_url + ' ' + stmt_pos
-                stmt_value = stmt_branch
-                site_dict[stmt_key] = stmt_value
 
         replace_file = open(path_to_log_dir + fname + '/replace_res', 'r')
         replace_content = replace_file.readlines()
@@ -334,7 +340,7 @@ if __name__ == '__main__':
     #dispatch_urls(js_dict)
     #dump_alexa_sites(N_TOP_ALEXA)
     #download_urllist(URL_TO_ALEXA_10K)
-    #merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)
+    merge_log_files(PATH_TO_FILTERED_LOG, PATH_TO_MERGED_LOG)
     #compare_two_rlists('../../logs/filterList1.csv', '../../logs/filterList2.csv', '../../logs/rank.csv')
     #delete_raw_log(PATH_TO_FILTERED_LOG)
     #delete_raw_log_regardless(PATH_TO_FILTERED_LOG)

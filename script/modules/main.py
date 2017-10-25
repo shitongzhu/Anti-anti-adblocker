@@ -253,6 +253,8 @@ def log_differ(path_to_dir, flag_mode, mapping):
     run_count = 0
     log_pattern = re.compile(NEW_PATTERN_LOG)
     blklist = set()
+    already_thened_dict = set()
+    already_elsed_dict = set()
     for fname in os.listdir(path_to_dir):
         files.append(path_to_dir + fname)
 
@@ -265,8 +267,6 @@ def log_differ(path_to_dir, flag_mode, mapping):
             return None
 
     for f in files:
-        already_thened_dict = set()
-        already_elsed_dict = set()
         already_ifed_dict = {}
         run_count += 1
         log_file = open(f, 'r')
@@ -315,7 +315,7 @@ def log_differ(path_to_dir, flag_mode, mapping):
                     grand_dict[trace_key_curr][0] = THIS_POS_HAS_IF_THEN
                     blklist.discard(trace_key_curr)
                 else:
-                    if grand_dict[trace_key_curr][0] != THIS_POS_HAS_IF_THEN:
+                    if grand_dict[trace_key_curr][0] != THIS_POS_HAS_IF_THEN or trace_key_curr in already_elsed_dict:
                         blklist.add(trace_key_curr)
                     else:
                         grand_dict[trace_key_curr][1].add(run_count)
@@ -329,7 +329,7 @@ def log_differ(path_to_dir, flag_mode, mapping):
                     grand_dict[trace_key_curr][0] = THIS_POS_HAS_IF_ELSE
                     blklist.discard(trace_key_curr)
                 else:
-                    if grand_dict[trace_key_curr][0] != THIS_POS_HAS_IF_ELSE:
+                    if grand_dict[trace_key_curr][0] != THIS_POS_HAS_IF_ELSE or trace_key_curr in already_thened_dict:
                         blklist.add(trace_key_curr)
                     else:
                         grand_dict[trace_key_curr][1].add(run_count)
@@ -477,7 +477,7 @@ def call_stack_test():
 
 
 if __name__ == '__main__':
-    url = 'baidu.com'
+    url = 'yesky.com'
     site_dir1 = (PATH_TO_FILTERED_LOG + url + '/w_adblocker/')
     site_dir2 = (PATH_TO_FILTERED_LOG + url + '/wo_adblocker/')
     cache = SignatureMapping()
