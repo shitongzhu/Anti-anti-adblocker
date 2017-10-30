@@ -317,6 +317,7 @@ def log_differ(path_to_dir, flag_mode, mapping):
                 else:
                     if grand_dict[trace_key_curr][0] != THIS_POS_HAS_IF_THEN or trace_key_curr in already_elsed_dict:
                         blklist.add(trace_key_curr)
+                        grand_dict[trace_key_curr][1].add(run_count)
                     else:
                         grand_dict[trace_key_curr][1].add(run_count)
             elif reg_group_curr[1] == 'ELSE':
@@ -331,6 +332,7 @@ def log_differ(path_to_dir, flag_mode, mapping):
                 else:
                     if grand_dict[trace_key_curr][0] != THIS_POS_HAS_IF_ELSE or trace_key_curr in already_thened_dict:
                         blklist.add(trace_key_curr)
+                        grand_dict[trace_key_curr][1].add(run_count)
                     else:
                         grand_dict[trace_key_curr][1].add(run_count)
             elif reg_group_curr[1] == 'ConditionalStatementTrue':
@@ -504,12 +506,15 @@ if __name__ == '__main__':
         files.append(PATH_TO_FILTERED_LOG + fname)
     print len(files)
     for url in files:
-        print url
-        site_dir1 = (url + '/w_adblocker/')
-        site_dir2 = (url + '/wo_adblocker/')
-        cache = SignatureMapping()
-        hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
-        hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
-        curr_site_dir = url + '/'
-        log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
+        try:
+            print url
+            site_dir1 = (url + '/w_adblocker/')
+            site_dir2 = (url + '/wo_adblocker/')
+            cache = SignatureMapping()
+            hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
+            hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
+            curr_site_dir = url + '/'
+            log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
+        except Exception:
+            continue
     #call_stack_test()
