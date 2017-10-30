@@ -363,8 +363,23 @@ def log_differ(path_to_dir, flag_mode, mapping):
 
 
 def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab, mapping):
+    def save_response(url, path_prefix):
+        page = requests.get(url)
+        if url.split('/')[-1] == '':
+            script_name = url.split('/')[-2]
+        else:
+            script_name = url.split('/')[-1]
+        f_cache = open(path_prefix + "/" + script_name, 'w')
+        content = page.text
+        f_cache.write(content)
+        f_cache.close()
+
+    def process_record(rec):
+        return rec.split()[0][1:]
+
     f = open(path_to_dir + 'diff_res', 'w')
     flag_flipping = False
+    script_set = set()
     print "[INFO][looper] Starting log diff..."
     for key, value in dict_wo_ab.iteritems():
         curr_val = dict_w_ab.get(key, -1)
@@ -372,6 +387,8 @@ def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab, mapping):
             continue
         if curr_val[0] != value[0]:
             flag_flipping = True
+            script_url = process_record(key)
+            script_set.add(script_url)
             if USE_SIG_MAPPING:
                 match_mark = "Unmatched: pos " + mapping.map_to_full(str(key)) + " abp-on " + str(dict_w_ab.get(key, -1)) \
                          + " abp-off " + str(dict_wo_ab.get(key, -1))
@@ -380,6 +397,11 @@ def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab, mapping):
                              " abp-off " + str(dict_wo_ab.get(key, -1))
             f.write(match_mark + '\n')
             print '[INFO][looper] ' + match_mark
+    if len(script_set) > 0:
+        os.makedirs(path_to_dir + '/script_cache/')
+    path_to_dir += '/script_cache/'
+    for scr_url in list(script_set):
+        save_response(scr_url, path_to_dir)
     if flag_flipping is False:
         print "[INFO][looper] No unmatch detected!"
         f.write('No unmatch detected!\n')
