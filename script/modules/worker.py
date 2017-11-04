@@ -25,3 +25,4 @@ def fetch_url():
                           queue='task_queue')
     channel.start_consuming()
     return url_fetched
+#test
