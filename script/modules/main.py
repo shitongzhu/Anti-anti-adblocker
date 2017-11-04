@@ -222,9 +222,9 @@ def log_extractor(path_to_log, flag_mode, url):
             script_url, stmt_type, position = \
                 reg_group[2], reg_group[3], 'x' + reg_group[0] + 'y' + reg_group[1] + 'o' + reg_group[4]
             if USE_CALL_STACK:
-                return '_' + script_url + ' ' + stmt_type + ' ' + position + '\n'
-            else:
                 return get_top_2_caller() + '_' + script_url + ' ' + stmt_type + ' ' + position + '\n'
+            else:
+                return '_' + script_url + ' ' + stmt_type + ' ' + position + '\n'
         else:
             return None
 
@@ -402,8 +402,9 @@ def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab, mapping):
     if len(script_set) > 0:
         os.makedirs(path_to_dir + '/script_cache/')
     path_to_dir += '/script_cache/'
-    for scr_url in list(script_set):
-        save_response(scr_url, path_to_dir)
+    if SAVE_SCRIPT_SNAPSHOT:
+        for scr_url in list(script_set):
+            save_response(scr_url, path_to_dir)
     if flag_flipping is False:
         print "[INFO][looper] No unmatch detected!"
         f.write('No unmatch detected!\n')
