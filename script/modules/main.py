@@ -9,6 +9,7 @@ import psutil
 from script.utils.SignatureMapping import SignatureMapping
 from script.utils.utils import *
 from script.modules.worker import fetch_url
+from script.modules.log_processing import *
 
 
 def kill_child_processes(parent_pid):
@@ -435,23 +436,25 @@ def main_loop():
                 p0.kill()
                 kill_child_processes(p1.pid)
                 p1.kill()
-                site_dir1 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_W_AB, url=url)
+                log_extractor(PATH_TO_LOG, flag_mode=FLAG_W_AB, url=url)
 
                 # 2nd pass, with adblock disabled
                 p2 = url_loader(url, is_with_ext=False)
                 time.sleep(TIMEOUT_LOAD_WO_AB)
                 kill_child_processes(p2.pid)
                 p2.kill()
-                site_dir2 = log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB, url=url)
+                log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB, url=url)
             cache = SignatureMapping()
-            hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
-            hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
+            #hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
+            #hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
             curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
+            diff_dict = process(curr_site_dir, cache)
+            report_diff(curr_site_dir, diff_dict, cache)
             if DELETE_ONGOING_RAW_LOG:
                 print '[INFO][switch] Ongoing raw log removal enabled!'
                 shutil.rmtree(curr_site_dir + 'w_adblocker/')
                 shutil.rmtree(curr_site_dir + 'wo_adblocker/')
-            log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
+            #log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
 
             js_dict = single_log_stat_analyzer(curr_site_dir)
             dispatch_urls(js_dict, curr_site_dir)
@@ -509,13 +512,11 @@ if __name__ == '__main__':
     for url in files:
         try:
             print url
-            site_dir1 = (url + '/w_adblocker/')
-            site_dir2 = (url + '/wo_adblocker/')
             cache = SignatureMapping()
-            hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
-            hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
-            curr_site_dir = url + '/'
-            log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
+            curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
+            diff_dict = process(curr_site_dir, cache)
+            report_diff(curr_site_dir, diff_dict, cache)
         except Exception:
+            print 'error'
             continue
     #call_stack_test()
