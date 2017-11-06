@@ -198,7 +198,7 @@ def process(site_dir, mapping):
             if sig in value:
                 wab_state = key
                 break
-        for key, value in wab_sets.iteritems():
+        for key, value in woab_sets.iteritems():
             if sig in value:
                 woab_state = key
                 break
