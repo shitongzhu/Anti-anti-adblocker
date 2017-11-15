@@ -444,21 +444,23 @@ def main_loop():
                 kill_child_processes(p2.pid)
                 p2.kill()
                 log_extractor(PATH_TO_LOG, flag_mode=FLAG_WO_AB, url=url)
-            cache = SignatureMapping()
-            #hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
-            #hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
-            curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
-            diff_dict = process(curr_site_dir, cache)
-            report_diff(curr_site_dir, diff_dict, cache)
-            if DELETE_ONGOING_RAW_LOG:
-                print '[INFO][switch] Ongoing raw log removal enabled!'
-                shutil.rmtree(curr_site_dir + 'w_adblocker/')
-                shutil.rmtree(curr_site_dir + 'wo_adblocker/')
-            #log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
+            if DO_LOG_DIFF:
+                cache = SignatureMapping()
+                #hashtable1 = log_differ(site_dir1, flag_mode=FLAG_W_AB, mapping=cache)
+                #hashtable2 = log_differ(site_dir2, flag_mode=FLAG_WO_AB, mapping=cache)
+                curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
+                diff_dict = process(curr_site_dir, cache)
+                report_diff(curr_site_dir, diff_dict, cache)
+                if DELETE_ONGOING_RAW_LOG:
+                    print '[INFO][switch] Ongoing raw log removal enabled!'
+                    shutil.rmtree(curr_site_dir + 'w_adblocker/')
+                    shutil.rmtree(curr_site_dir + 'wo_adblocker/')
+                #log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
 
-            js_dict = single_log_stat_analyzer(curr_site_dir)
-            dispatch_urls(js_dict, curr_site_dir)
-            #sync_list_file(PATH_TO_URLFILE)
+                if GENERATE_DIFF_STAT:
+                    js_dict = single_log_stat_analyzer(curr_site_dir)
+                    dispatch_urls(js_dict, curr_site_dir)
+                    #sync_list_file(PATH_TO_URLFILE)
             print '[INFO][looper] This site is done\n'
         except Exception as e:
             error_msg = '[FATAL][looper] ' + str(e)
