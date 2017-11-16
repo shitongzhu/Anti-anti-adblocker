@@ -141,4 +141,4 @@ GENERATE_DIFF_STAT = False
 
 DUMMY_LOG_RECORD = '_http://dummy.com/ IF x888y888o888'
 
-DISPATCHER_HOST = 'ec2-54-219-176-160.us-west-1.compute.amazonaws.com'
+DISPATCHER_HOST = 'ec2-54-193-27-131.us-west-1.compute.amazonaws.com'
