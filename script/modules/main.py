@@ -451,16 +451,15 @@ def main_loop():
                 curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
                 diff_dict = process(curr_site_dir, cache)
                 report_diff(curr_site_dir, diff_dict, cache)
+                if GENERATE_DIFF_STAT:
+                    js_dict = single_log_stat_analyzer(curr_site_dir)
+                    dispatch_urls(js_dict, curr_site_dir)
             if DELETE_ONGOING_RAW_LOG:
                 print '[INFO][switch] Ongoing raw log removal enabled!'
                 shutil.rmtree(curr_site_dir + 'w_adblocker/')
                 shutil.rmtree(curr_site_dir + 'wo_adblocker/')
                 #log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
-
-                if GENERATE_DIFF_STAT:
-                    js_dict = single_log_stat_analyzer(curr_site_dir)
-                    dispatch_urls(js_dict, curr_site_dir)
-                    #sync_list_file(PATH_TO_URLFILE)
+                #sync_list_file(PATH_TO_URLFILE)
             print '[INFO][looper] This site is done\n'
         except Exception as e:
             error_msg = '[FATAL][looper] ' + str(e)
