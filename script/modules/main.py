@@ -451,10 +451,10 @@ def main_loop():
                 curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
                 diff_dict = process(curr_site_dir, cache)
                 report_diff(curr_site_dir, diff_dict, cache)
-                if DELETE_ONGOING_RAW_LOG:
-                    print '[INFO][switch] Ongoing raw log removal enabled!'
-                    shutil.rmtree(curr_site_dir + 'w_adblocker/')
-                    shutil.rmtree(curr_site_dir + 'wo_adblocker/')
+            if DELETE_ONGOING_RAW_LOG:
+                print '[INFO][switch] Ongoing raw log removal enabled!'
+                shutil.rmtree(curr_site_dir + 'w_adblocker/')
+                shutil.rmtree(curr_site_dir + 'wo_adblocker/')
                 #log_reporter(curr_site_dir, hashtable1, hashtable2, mapping=cache)
 
                 if GENERATE_DIFF_STAT:

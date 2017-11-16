@@ -136,9 +136,9 @@ BEHIND_PROXY = False
 USE_SIG_MAPPING = True
 VERIFY_RUN = False
 SAVE_SCRIPT_SNAPSHOT = False
-DO_LOG_DIFF = True
+DO_LOG_DIFF = False
 GENERATE_DIFF_STAT = False
 
 DUMMY_LOG_RECORD = '_http://dummy.com/ IF x888y888o888'
 
-DISPATCHER_HOST = 'ec2-52-53-162-48.us-west-1.compute.amazonaws.com'
+DISPATCHER_HOST = 'ec2-54-219-176-160.us-west-1.compute.amazonaws.com'
