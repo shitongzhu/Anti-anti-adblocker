@@ -215,8 +215,8 @@ def log_extractor(path_to_log, flag_mode, url):
             return ""
 
     def func_transform(line):
-        if call_stack_builder(line):
-            return None
+        #if call_stack_builder(line):
+        #    return None
         reg_match = re.match(log_pattern, line)
         if reg_match:
             reg_group = reg_match.groups()
