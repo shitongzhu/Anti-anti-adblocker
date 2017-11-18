@@ -426,9 +426,10 @@ def main_loop():
             else:
                 print "[INFO][looper] Deleted duplicate directory"
 
+            print os.getcwd()
             # Pre-warming for generating caches
             p00 = url_loader(url, is_with_ext=False)
-            time.sleep(TIMEOUT_LOAD_WO_AB)
+            time.sleep(TIMEOUT_LOAD_PRE_WARMING)
             kill_child_processes(p00.pid)
             p00.kill()
             for i in range(NUM_OF_RUNS):
@@ -460,6 +461,12 @@ def main_loop():
                 if GENERATE_DIFF_STAT:
                     js_dict = single_log_stat_analyzer(curr_site_dir)
                     dispatch_urls(js_dict, curr_site_dir)
+            if COMPRESS_RAW_LOG:
+                tar_file_name = curr_site_dir + "raw_log.tar.gz"
+                wo_path = curr_site_dir + '../' + url + '/w_adblocker/'
+                w_path = curr_site_dir + '../' + url + '/wo_adblocker/'
+                print '[INFO][log] Compressing raw logs...'
+                os.system("tar -cvzf" + " " + tar_file_name + " " + w_path + " " + wo_path)
             if DELETE_ONGOING_RAW_LOG:
                 print '[INFO][switch] Ongoing raw log removal enabled!'
                 shutil.rmtree(curr_site_dir + 'w_adblocker/')
