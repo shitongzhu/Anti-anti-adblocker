@@ -247,7 +247,7 @@ def log_extractor(path_to_log, flag_mode, url):
     unload(output_path, filtered_log)
     return output_dir
 
-
+'''
 def log_differ(path_to_dir, flag_mode, mapping):
     files = []
     grand_dict = {}
@@ -363,6 +363,7 @@ def log_differ(path_to_dir, flag_mode, mapping):
             del grand_dict_copy[key]
 
     return grand_dict_copy
+'''
 
 
 def log_reporter(path_to_dir, dict_w_ab, dict_wo_ab, mapping):
@@ -425,6 +426,11 @@ def main_loop():
             else:
                 print "[INFO][looper] Deleted duplicate directory"
 
+            # Pre-warming for generating caches
+            p00 = url_loader(url, is_with_ext=False)
+            time.sleep(TIMEOUT_LOAD_WO_AB)
+            kill_child_processes(p00.pid)
+            p00.kill()
             for i in range(NUM_OF_RUNS):
                 # 1st pass, with adblock enabled
                 # tick its runtime
@@ -473,7 +479,7 @@ def main_loop():
 
     print '[INFO][looper] A batch of experiments are done!'
 
-
+'''
 def call_stack_test():
     def load(path_to_file):
         f = open(path_to_file, 'r')
@@ -503,7 +509,7 @@ def call_stack_test():
     for line in log:
         call_stack_builder(line)
     print call_stack
-
+'''
 
 if __name__ == '__main__':
     files = []
