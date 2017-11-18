@@ -24,7 +24,7 @@ PATH_TO_URLFILE      = '../../res/urllist' + ID + '.txt'
 PATH_TO_LOG          = '/tmp/adblockJSLog' + ID + '.txt'
 PATH_TO_FILTERED_LOG = '../../logs/log' + ID + '/'
 PATH_TO_STAT_FILE    = '../../logs/total_stat'
-PATH_TO_PROFILE      = '../../profiles/profile' + ID + '/'
+PATH_TO_PROFILE      = '../../profiles/profile' + ID + '/Default/'
 PATH_TO_MERGED_LOG   = '../../logs/filterList' + ID + '.csv'
 
 # signals
@@ -126,7 +126,7 @@ DISTRIBUTE_URLLIST = False
 FETCH_URL = False
 DOWNLOAD_LIST = False
 DELETE_RAW_LOG = False
-DELETE_ONGOING_RAW_LOG = False
+DELETE_ONGOING_RAW_LOG = True
 BACKUP_OLD_LOG = False
 REMOVE_INCOMPLETE_LOGS = False
 RUN_EXP = False
@@ -139,6 +139,7 @@ VERIFY_RUN = False
 SAVE_SCRIPT_SNAPSHOT = False
 DO_LOG_DIFF = False
 GENERATE_DIFF_STAT = False
+COMPRESS_RAW_LOG = True
 
 DUMMY_LOG_RECORD = '_http://dummy.com/ IF x888y888o888'
 
