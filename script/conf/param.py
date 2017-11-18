@@ -83,6 +83,7 @@ NOT_IF = 7
 # timeout for loading pages (by sec)
 TIMEOUT_LOAD_W_AB = 60
 TIMEOUT_LOAD_WO_AB = 60
+TIMEOUT_LOAD_PRE_WARMING = 100
 
 TIMEOUT_WARMING = 3
 
