@@ -24,7 +24,7 @@ PATH_TO_URLFILE      = '../../res/urllist' + ID + '.txt'
 PATH_TO_LOG          = '/tmp/adblockJSLog' + ID + '.txt'
 PATH_TO_FILTERED_LOG = '../../logs/log' + ID + '/'
 PATH_TO_STAT_FILE    = '../../logs/total_stat'
-PATH_TO_PROFILE      = '../../profiles/profile' + ID + '/'
+PATH_TO_PROFILE      = '../../profiles/profile' + ID + '/Default/'
 PATH_TO_MERGED_LOG   = '../../logs/filterList' + ID + '.csv'
 
 # signals
@@ -81,9 +81,9 @@ INCONSISTENT = 6
 NOT_IF = 7
 
 # timeout for loading pages (by sec)
-TIMEOUT_LOAD_W_AB = 60
-TIMEOUT_LOAD_WO_AB = 60
-TIMEOUT_LOAD_PRE_WARMING = 100
+TIMEOUT_LOAD_W_AB = 30
+TIMEOUT_LOAD_WO_AB = 30
+TIMEOUT_LOAD_PRE_WARMING = 30
 
 TIMEOUT_WARMING = 3
 
@@ -143,4 +143,4 @@ COMPRESS_RAW_LOG = True
 
 DUMMY_LOG_RECORD = '_http://dummy.com/ IF x888y888o888'
 
-DISPATCHER_HOST = 'ec2-54-219-176-160.us-west-1.compute.amazonaws.com'
+DISPATCHER_HOST = 'ec2-54-183-178-81.us-west-1.compute.amazonaws.com'
