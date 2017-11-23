@@ -1,3 +1,4 @@
 import os
+import sys
 
-os.chdir('/home/shitong/Desktop/diffexecproj/offline/script/anti-anti-adblocker1/')
+sys.path.append(os.getcwd())

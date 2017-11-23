@@ -8,7 +8,6 @@ import psutil
 import os
 import sys
 
-sys.path.append(os.getcwd())
 
 from script.utils.utils import *
 from script.modules.worker import fetch_url
