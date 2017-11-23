@@ -5,8 +5,11 @@ import subprocess
 import traceback
 
 import psutil
+import os
+import sys
 
-from script.utils.SignatureMapping import SignatureMapping
+sys.path.append(os.getcwd())
+
 from script.utils.utils import *
 from script.modules.worker import fetch_url
 from script.modules.log_processing import *
@@ -519,6 +522,7 @@ def call_stack_test():
 '''
 
 if __name__ == '__main__':
+    print sys.path[0]
     files = []
     for fname in os.listdir(PATH_TO_FILTERED_LOG):
         files.append(PATH_TO_FILTERED_LOG + fname)
@@ -531,7 +535,11 @@ if __name__ == '__main__':
         os.system("tar -xvzf" + " " + tar_file_name + " -C " + curr_site_dir)
         wo_path = curr_site_dir + url + '/w_adblocker/'
         w_path = curr_site_dir + url + '/wo_adblocker/'
-        print w_path
+        try:
+            shutil.rmtree(curr_site_dir + 'w_adblocker/')
+            shutil.rmtree(curr_site_dir + 'wo_adblocker/')
+        except OSError:
+            print "[INFO][log] Current directory is empty"
         os.system("mv -t " + curr_site_dir + " " + wo_path + " " + w_path)
         diff_dict = process(curr_site_dir, cache)
         report_diff(curr_site_dir, diff_dict, cache)

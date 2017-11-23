@@ -4,6 +4,7 @@
 import os
 import socket
 import requests
+import sys
 
 
 # infer our browser id based on working directory

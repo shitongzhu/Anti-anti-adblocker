@@ -206,8 +206,8 @@ def process(site_dir, mapping):
 
     diver_dict = {}
 
-    wab_dir = site_dir + '/w_adblocker/'
-    woab_dir = site_dir + '/wo_adblocker/'
+    wab_dir = site_dir + 'w_adblocker/'
+    woab_dir = site_dir + 'wo_adblocker/'
     wab_valid, wab_sets = process_per_setting(wab_dir, mapping)
     woab_valid, woab_sets = process_per_setting(woab_dir, mapping)
 
