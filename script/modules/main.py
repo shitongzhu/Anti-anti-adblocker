@@ -524,13 +524,18 @@ if __name__ == '__main__':
         files.append(PATH_TO_FILTERED_LOG + fname)
     print len(files)
     for url in files:
-        try:
-            print url
-            cache = SignatureMapping()
-            curr_site_dir = PATH_TO_FILTERED_LOG + url + '/'
-            diff_dict = process(curr_site_dir, cache)
-            report_diff(curr_site_dir, diff_dict, cache)
-        except Exception:
-            print 'error'
-            continue
+        cache = SignatureMapping()
+        curr_site_dir = url + '/'
+        url = url.split('/')[-1]
+        tar_file_name = curr_site_dir + "raw_log.tar.gz"
+        os.system("tar -xvzf" + " " + tar_file_name + " -C " + curr_site_dir)
+        wo_path = curr_site_dir + url + '/w_adblocker/'
+        w_path = curr_site_dir + url + '/wo_adblocker/'
+        print w_path
+        os.system("mv -t " + curr_site_dir + " " + wo_path + " " + w_path)
+        diff_dict = process(curr_site_dir, cache)
+        report_diff(curr_site_dir, diff_dict, cache)
+        shutil.rmtree(curr_site_dir + 'w_adblocker/')
+        shutil.rmtree(curr_site_dir + 'wo_adblocker/')
+        shutil.rmtree(curr_site_dir + url + '/')
     #call_stack_test()
