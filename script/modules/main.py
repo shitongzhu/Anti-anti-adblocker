@@ -530,22 +530,28 @@ if __name__ == '__main__':
     for url in files:
         curr_site_dir = url + '/'
         if not os.path.isfile(curr_site_dir + 'diff_res'):
-            cache = SignatureMapping()
-            url = url.split('/')[-1]
-            tar_file_name = curr_site_dir + "raw_log.tar.gz"
-            os.system("tar -xvzf" + " " + tar_file_name + " -C " + curr_site_dir)
-            wo_path = curr_site_dir + url + '/w_adblocker/'
-            w_path = curr_site_dir + url + '/wo_adblocker/'
             try:
-                shutil.rmtree(curr_site_dir + 'w_adblocker/')
-                shutil.rmtree(curr_site_dir + 'wo_adblocker/')
-            except OSError:
-                print "[INFO][log] Current directory is empty"
-            os.system("mv -t " + curr_site_dir + " " + wo_path + " " + w_path)
-            diff_dict = process(curr_site_dir, cache)
-            report_diff(curr_site_dir, diff_dict, cache)
-            shutil.rmtree(curr_site_dir + 'w_adblocker/')
-            shutil.rmtree(curr_site_dir + 'wo_adblocker/')
-            shutil.rmtree(curr_site_dir + url + '/')
+                cache = SignatureMapping()
+                url = url.split('/')[-1]
+                tar_file_name = curr_site_dir + "raw_log.tar.gz"
+                os.system("tar -xvzf" + " " + tar_file_name + " -C " + curr_site_dir)
+                wo_path = curr_site_dir + url + '/w_adblocker/'
+                w_path = curr_site_dir + url + '/wo_adblocker/'
+                try:
+                    shutil.rmtree(curr_site_dir + 'w_adblocker/')
+                    shutil.rmtree(curr_site_dir + 'wo_adblocker/')
+                except OSError:
+                    print "[INFO][log] Current directory is empty"
+                os.system("mv -t " + curr_site_dir + " " + wo_path + " " + w_path)
+                diff_dict = process(curr_site_dir, cache)
+                report_diff(curr_site_dir, diff_dict, cache)
+                try:
+                    shutil.rmtree(curr_site_dir + 'w_adblocker/')
+                    shutil.rmtree(curr_site_dir + 'wo_adblocker/')
+                    shutil.rmtree(curr_site_dir + url + '/')
+                except OSError:
+                    print "[ERROR][log] Some extracted files disappeared"
+            except Exception as err:
+                print "[ERROR][log] WTF? " + str(err)
         else:
             continue
