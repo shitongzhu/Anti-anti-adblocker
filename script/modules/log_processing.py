@@ -178,9 +178,9 @@ def report_diff(diff_dir, diff_dict, mapping):
         has_diff = True
         if USE_SIG_MAPPING:
             diff_mark = "Unmatched: pos " + mapping.map_to_full(diff_sig) + " abp-on " + diff_states['wab'] \
-                        + " abp-off " + diff_states['wab']
+                        + " abp-off " + diff_states['woab']
         else:
-            diff_mark = "Unmatched: pos " + diff_sig + " abp-on " + diff_states['woab'] + " abp-off " + diff_states['woab']
+            diff_mark = "Unmatched: pos " + diff_sig + " abp-on " + diff_states['wab'] + " abp-off " + diff_states['woab']
         file_diff.write(diff_mark + '\n')
         print '[INFO][looper] ' + diff_mark
 

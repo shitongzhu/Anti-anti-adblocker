@@ -13,9 +13,7 @@ from script.utils.jsmodifier import *
 
 def log_stat_collector(path_to_filtered_dir, path_to_stat_file):
     fstat = open(path_to_stat_file, 'w')
-    fstat.write('\n\n--------- New Stats at Timestemp ' +
-                strftime("%Y-%m-%d %H:%M:%S", gmtime()) +
-                ' ---------\n')
+    fstat.write('##' + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + '\n')
     curr_positive, curr_negative = set(), set()
     for fname in os.listdir(path_to_filtered_dir):
         try:
@@ -32,22 +30,21 @@ def log_stat_collector(path_to_filtered_dir, path_to_stat_file):
         except IndexError:
             continue
         diff_file.close()
-    fstat.write('\n>> Negative sites:\n')
+    fstat.write('##negative_sites\n')
     for r in list(curr_negative):
-        fstat.write('-- ' + r + '\n')
-    fstat.write('\n>> Positive sites:\n')
+        fstat.write(r + ',false\n')
+    fstat.write('\n##positive_sites\n')
     for r in list(curr_positive):
-        fstat.write('-- ' + r + '\n')
-    fstat.write('\n---------- Stats Summary ----------\n')
-    fstat.write('Total number of this run is '
+        fstat.write(r + ',true\n')
+    fstat.write('##statistics\n')
+    fstat.write('total_num='
                 + str(len(curr_negative) + len(curr_positive)) + '\n')
-    fstat.write('Total number of negative cases is '
+    fstat.write('total_negatives='
                 + str(len(curr_negative)) + '\n')
-    fstat.write('Total number of positive cases is '
+    fstat.write('total_positives='
                 + str(len(curr_positive)) + '\n')
-    fstat.write('The positive rate is therefore '
+    fstat.write('positive_rate='
                 + str(len(curr_positive) / float(len(curr_negative) + len(curr_positive))) + '\n')
-    fstat.write('----------- Stats Ends ------------')
     fstat.close()
 
 
